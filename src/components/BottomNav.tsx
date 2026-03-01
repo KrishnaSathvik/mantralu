@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, BookOpen, Search, Heart, Settings } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -14,8 +15,8 @@ export function BottomNav() {
   const { pathname } = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-md safe-area-bottom">
-      <div className="mx-auto flex max-w-lg items-center justify-around py-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-md safe-area-bottom safe-area-x">
+      <div className="mx-auto flex max-w-lg items-center justify-around py-2 pb-[max(0.5rem,var(--safe-area-bottom))]">
         {navItems.map(({ to, icon: Icon, label }) => {
           const active = pathname === to;
           return (
@@ -23,12 +24,19 @@ export function BottomNav() {
               key={to}
               to={to}
               className={cn(
-                "flex flex-col items-center gap-0.5 px-3 py-1.5 text-xs transition-colors",
+                "relative flex flex-col items-center gap-0.5 px-3 py-1.5 text-xs transition-colors",
                 active
                   ? "text-primary font-semibold"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
+              {active && (
+                <motion.div
+                  layoutId="nav-indicator"
+                  className="absolute -top-2 left-1/2 -translate-x-1/2 h-0.5 w-6 rounded-full bg-primary"
+                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                />
+              )}
               <Icon className={cn("h-5 w-5", active && "fill-primary/20")} />
               <span>{label}</span>
             </Link>
