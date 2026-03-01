@@ -1,20 +1,28 @@
 import { Link } from "react-router-dom";
-import { mantras } from "@/data/sample-mantras";
 import { Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { useMantras } from "@/hooks/use-mantras";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useMemo } from "react";
 
 export function DailyMantra() {
+  const { data: mantras, isLoading } = useMantras();
+
   const mantra = useMemo(() => {
+    if (!mantras?.length) return null;
     const dayIndex = new Date().getDate() % mantras.length;
     return mantras[dayIndex];
-  }, []);
+  }, [mantras]);
+
+  if (isLoading || !mantra) {
+    return <Skeleton className="h-44 rounded-xl" />;
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: [0, 0, 0.2, 1] }}
       whileHover={{ y: -3 }}
     >
       <Link
@@ -39,7 +47,7 @@ export function DailyMantra() {
           {mantra.title_te}
         </p>
         <p className="font-telugu text-base leading-relaxed text-foreground/80 line-clamp-2">
-          {mantra.text_te.split("\n").slice(0, 2).join(" ")}
+          {mantra.telugu_text.split("\n").slice(0, 2).join(" ")}
         </p>
         <p className="mt-3 text-sm font-medium text-primary">
           Read & Chant →

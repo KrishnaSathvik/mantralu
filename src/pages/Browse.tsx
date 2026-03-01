@@ -1,11 +1,12 @@
 import { useSearchParams, Link } from "react-router-dom";
 import { MantraCard } from "@/components/MantraCard";
 import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
-import { mantras, categories, deities } from "@/data/sample-mantras";
+import { useMantras, useCategories, useDeities } from "@/hooks/use-mantras";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Browse = () => {
   const [searchParams] = useSearchParams();
@@ -14,20 +15,24 @@ const Browse = () => {
   const [selectedDeity, setSelectedDeity] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
 
+  const { data: mantras, isLoading: mantrasLoading } = useMantras();
+  const { data: categories } = useCategories();
+  const { data: deities } = useDeities();
+
   const allTags = useMemo(() => {
     const tagSet = new Set<string>();
-    mantras.forEach((m) => m.tags.forEach((t) => tagSet.add(t)));
+    mantras?.forEach((m) => m.tags?.forEach((t) => tagSet.add(t)));
     return Array.from(tagSet);
-  }, []);
+  }, [mantras]);
 
   const filtered = useMemo(() => {
-    return mantras.filter((m) => {
-      if (selectedCategory && m.category !== selectedCategory) return false;
-      if (selectedDeity && m.deity !== selectedDeity) return false;
-      if (selectedTag && !m.tags.includes(selectedTag)) return false;
+    return (mantras || []).filter((m) => {
+      if (selectedCategory && m.category?.slug !== selectedCategory) return false;
+      if (selectedDeity && m.deity?.name_en !== selectedDeity) return false;
+      if (selectedTag && !m.tags?.includes(selectedTag)) return false;
       return true;
     });
-  }, [selectedCategory, selectedDeity, selectedTag]);
+  }, [mantras, selectedCategory, selectedDeity, selectedTag]);
 
   const FilterChip = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
     <motion.button
@@ -59,7 +64,7 @@ const Browse = () => {
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Category</h3>
             <div className="flex flex-wrap gap-2">
               <FilterChip active={!selectedCategory} onClick={() => setSelectedCategory("")}>All</FilterChip>
-              {categories.map((c) => (
+              {categories?.map((c) => (
                 <FilterChip key={c.id} active={selectedCategory === c.slug} onClick={() => setSelectedCategory(selectedCategory === c.slug ? "" : c.slug)}>
                   {c.icon} {c.name_en}
                 </FilterChip>
@@ -71,7 +76,7 @@ const Browse = () => {
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Deity</h3>
             <div className="flex flex-wrap gap-2">
               <FilterChip active={!selectedDeity} onClick={() => setSelectedDeity("")}>All</FilterChip>
-              {deities.map((d) => (
+              {deities?.map((d) => (
                 <FilterChip key={d.id} active={selectedDeity === d.name_en} onClick={() => setSelectedDeity(selectedDeity === d.name_en ? "" : d.name_en)}>
                   {d.icon} {d.name_en}
                 </FilterChip>
@@ -90,17 +95,25 @@ const Browse = () => {
             </div>
           </div>
 
-          <StaggerContainer className="space-y-2.5">
-            {filtered.length > 0 ? (
-              filtered.map((m) => (
-                <StaggerItem key={m.id}>
-                  <MantraCard mantra={m} />
-                </StaggerItem>
-              ))
-            ) : (
-              <p className="text-center text-muted-foreground py-8">No mantras found for these filters.</p>
-            )}
-          </StaggerContainer>
+          {mantrasLoading ? (
+            <div className="space-y-2.5">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-24 rounded-lg" />
+              ))}
+            </div>
+          ) : (
+            <StaggerContainer className="space-y-2.5">
+              {filtered.length > 0 ? (
+                filtered.map((m) => (
+                  <StaggerItem key={m.id}>
+                    <MantraCard mantra={m} />
+                  </StaggerItem>
+                ))
+              ) : (
+                <p className="text-center text-muted-foreground py-8">No mantras found for these filters.</p>
+              )}
+            </StaggerContainer>
+          )}
         </main>
       </div>
     </PageTransition>

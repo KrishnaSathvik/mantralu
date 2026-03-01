@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { useState, useMemo, useEffect } from "react";
-import { mantras } from "@/data/sample-mantras";
+import { useMantras } from "@/hooks/use-mantras";
 import { MantraCard } from "@/components/MantraCard";
 import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
 import { Search, ArrowLeft } from "lucide-react";
@@ -10,24 +10,25 @@ const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const initialQ = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQ);
+  const { data: mantras } = useMantras();
 
   useEffect(() => {
     setQuery(searchParams.get("q") || "");
   }, [searchParams]);
 
   const results = useMemo(() => {
-    if (!query.trim()) return [];
+    if (!query.trim() || !mantras) return [];
     const q = query.toLowerCase();
     return mantras.filter(
       (m) =>
         m.title_en.toLowerCase().includes(q) ||
         m.title_te.includes(query) ||
-        m.text_te.includes(query) ||
+        m.telugu_text.includes(query) ||
         m.transliteration.toLowerCase().includes(q) ||
-        m.deity.toLowerCase().includes(q) ||
-        m.tags.some((t) => t.includes(q))
+        m.deity?.name_en.toLowerCase().includes(q) ||
+        m.tags?.some((t) => t.includes(q))
     );
-  }, [query]);
+  }, [query, mantras]);
 
   return (
     <PageTransition>

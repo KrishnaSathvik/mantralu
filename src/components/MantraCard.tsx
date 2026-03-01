@@ -3,10 +3,10 @@ import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/hooks/use-settings";
-import type { Mantra } from "@/data/sample-mantras";
+import type { DbMantra } from "@/hooks/use-mantras";
 
 interface MantraCardProps {
-  mantra: Mantra;
+  mantra: DbMantra;
   compact?: boolean;
 }
 
@@ -35,12 +35,16 @@ export function MantraCard({ mantra, compact }: MantraCardProps) {
               </p>
             )}
             <div className="mt-2 flex flex-wrap gap-1.5">
-              <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                {mantra.deity}
-              </span>
-              <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
-                {mantra.category}
-              </span>
+              {mantra.deity && (
+                <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                  {mantra.deity.icon} {mantra.deity.name_en}
+                </span>
+              )}
+              {mantra.category && (
+                <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                  {mantra.category.icon} {mantra.category.name_en}
+                </span>
+              )}
             </div>
           </div>
           <motion.button
