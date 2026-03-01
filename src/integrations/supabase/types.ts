@@ -124,6 +124,7 @@ export type Database = {
       mantras: {
         Row: {
           benefits: Json | null
+          benefits_te: Json | null
           category_id: string | null
           chant_count: number | null
           created_at: string
@@ -142,9 +143,11 @@ export type Database = {
           transliteration: string
           updated_at: string
           when_to_chant: string | null
+          when_to_chant_te: string | null
         }
         Insert: {
           benefits?: Json | null
+          benefits_te?: Json | null
           category_id?: string | null
           chant_count?: number | null
           created_at?: string
@@ -163,9 +166,11 @@ export type Database = {
           transliteration: string
           updated_at?: string
           when_to_chant?: string | null
+          when_to_chant_te?: string | null
         }
         Update: {
           benefits?: Json | null
+          benefits_te?: Json | null
           category_id?: string | null
           chant_count?: number | null
           created_at?: string
@@ -184,6 +189,7 @@ export type Database = {
           transliteration?: string
           updated_at?: string
           when_to_chant?: string | null
+          when_to_chant_te?: string | null
         }
         Relationships: [
           {

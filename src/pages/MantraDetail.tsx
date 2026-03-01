@@ -63,7 +63,9 @@ const MantraDetail = () => {
   }
 
   const isFav = favorites.includes(mantra.id);
-  const benefits = Array.isArray(mantra.benefits) ? mantra.benefits : [];
+  const benefitsEn = Array.isArray(mantra.benefits) ? mantra.benefits : [];
+  const benefitsTe = Array.isArray((mantra as any).benefits_te) ? (mantra as any).benefits_te : [];
+  const whenToChantTe = (mantra as any).when_to_chant_te as string | null;
   const hasVerses = verses.length > 0;
 
   const handleShare = async () => {
@@ -232,43 +234,49 @@ const MantraDetail = () => {
               </motion.section>
 
               {/* Benefits */}
-              {benefits.length > 0 && (
-                <motion.section custom={4} initial="hidden" animate="visible" variants={sectionVariants}
-                  className="rounded-xl border bg-card p-5"
-                >
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3 flex items-center gap-1.5">
-                    <Sparkles className="h-3 w-3" /> {viewMode === "telugu" ? "ప్రయోజనాలు" : "Benefits"}
-                  </h3>
-                  <ul className="space-y-2">
-                    {benefits.map((b, i) => (
-                      <li key={i} className="text-sm leading-relaxed text-foreground/85 flex gap-2.5">
-                        <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5">
-                          {i + 1}
-                        </span>
-                        <span>{b}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.section>
-              )}
-
-              {/* When to Chant */}
-              {mantra.when_to_chant && (
-                <motion.section custom={5} initial="hidden" animate="visible" variants={sectionVariants}
-                  className="rounded-xl border bg-card p-5"
-                >
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3 flex items-center gap-1.5">
-                    <Clock className="h-3 w-3" /> {viewMode === "telugu" ? "ఎప్పుడు చదవాలి" : "When to Chant"}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-foreground/85">{mantra.when_to_chant}</p>
-                  {mantra.chant_count && (
-                    <div className="mt-3 flex items-center gap-2 rounded-lg bg-primary/8 px-3 py-2">
-                      <span className="text-sm font-semibold text-primary">🔢 {mantra.chant_count}×</span>
-                      <span className="text-xs text-muted-foreground">{viewMode === "telugu" ? "సార్లు చదవాలి" : "recommended repetitions"}</span>
-                    </div>
-                  )}
-                </motion.section>
-              )}
+              {(() => {
+                const benefits = viewMode === "telugu" && benefitsTe.length > 0 ? benefitsTe : benefitsEn;
+                const wtc = viewMode === "telugu" && whenToChantTe ? whenToChantTe : mantra.when_to_chant;
+                return (
+                  <>
+                    {benefits.length > 0 && (
+                      <motion.section custom={4} initial="hidden" animate="visible" variants={sectionVariants}
+                        className="rounded-xl border bg-card p-5"
+                      >
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3 flex items-center gap-1.5">
+                          <Sparkles className="h-3 w-3" /> {viewMode === "telugu" ? "ప్రయోజనాలు" : "Benefits"}
+                        </h3>
+                        <ul className="space-y-2">
+                          {benefits.map((b: string, i: number) => (
+                            <li key={i} className={cn("text-sm leading-relaxed text-foreground/85 flex gap-2.5", viewMode === "telugu" && "font-telugu")}>
+                              <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5">
+                                {i + 1}
+                              </span>
+                              <span>{b}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </motion.section>
+                    )}
+                    {wtc && (
+                      <motion.section custom={5} initial="hidden" animate="visible" variants={sectionVariants}
+                        className="rounded-xl border bg-card p-5"
+                      >
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3 flex items-center gap-1.5">
+                          <Clock className="h-3 w-3" /> {viewMode === "telugu" ? "ఎప్పుడు చదవాలి" : "When to Chant"}
+                        </h3>
+                        <p className={cn("text-sm leading-relaxed text-foreground/85", viewMode === "telugu" && "font-telugu")}>{wtc}</p>
+                        {mantra.chant_count && (
+                          <div className="mt-3 flex items-center gap-2 rounded-lg bg-primary/8 px-3 py-2">
+                            <span className="text-sm font-semibold text-primary">🔢 {mantra.chant_count}×</span>
+                            <span className="text-xs text-muted-foreground">{viewMode === "telugu" ? "సార్లు చదవాలి" : "recommended repetitions"}</span>
+                          </div>
+                        )}
+                      </motion.section>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           ) : (
             /* === SINGLE-TEXT CONTENT (short mantras) === */
@@ -304,7 +312,7 @@ const MantraDetail = () => {
                 <p className="text-sm leading-relaxed text-foreground/85">{mantra.meaning_en}</p>
               </motion.section>
 
-              {benefits.length > 0 && (
+              {benefitsEn.length > 0 && (
                 <motion.section custom={5} initial="hidden" animate="visible" variants={sectionVariants}
                   className="rounded-xl border bg-card p-5"
                 >
@@ -312,7 +320,7 @@ const MantraDetail = () => {
                     <Sparkles className="h-3 w-3" /> Benefits
                   </h3>
                   <ul className="space-y-2">
-                    {benefits.map((b, i) => (
+                    {benefitsEn.map((b, i) => (
                       <li key={i} className="text-sm leading-relaxed text-foreground/85 flex gap-2.5">
                         <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5">
                           {i + 1}
