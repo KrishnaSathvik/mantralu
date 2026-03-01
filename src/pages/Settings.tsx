@@ -84,7 +84,7 @@ const Settings = () => {
             <h3 className="font-semibold text-foreground mb-1">About MantraVani</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               A devotional app for browsing Hindu mantras, prayers, and stotras in Telugu and English.
-              Built with love for spiritual seekers. 🙏
+              Built with love for spiritual seekers.
             </p>
           </motion.div>
         </main>

@@ -268,7 +268,7 @@ const MantraDetail = () => {
                         <p className={cn("text-sm leading-relaxed text-foreground/85", viewMode === "telugu" && "font-telugu")}>{wtc}</p>
                         {mantra.chant_count && (
                           <div className="mt-3 flex items-center gap-2 rounded-lg bg-primary/8 px-3 py-2">
-                            <span className="text-sm font-semibold text-primary">📿 {mantra.chant_count}×</span>
+                            <span className="text-sm font-semibold text-primary">{mantra.chant_count}×</span>
                             <span className="text-xs text-muted-foreground">{viewMode === "telugu" ? "సార్లు చదవాలి" : "recommended repetitions"}</span>
                           </div>
                         )}
@@ -342,7 +342,7 @@ const MantraDetail = () => {
                   <p className="text-sm leading-relaxed text-foreground/85">{mantra.when_to_chant}</p>
                   {mantra.chant_count && (
                     <div className="mt-3 flex items-center gap-2 rounded-lg bg-primary/8 px-3 py-2">
-                      <span className="text-sm font-semibold text-primary">📿 {mantra.chant_count}×</span>
+                      <span className="text-sm font-semibold text-primary">{mantra.chant_count}×</span>
                       <span className="text-xs text-muted-foreground">recommended repetitions</span>
                     </div>
                   )}
