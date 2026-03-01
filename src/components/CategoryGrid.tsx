@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCategories } from "@/hooks/use-mantras";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DynamicIcon } from "@/components/DynamicIcon";
 
 export function CategoryGrid() {
   const { data: categories, isLoading } = useCategories();
@@ -31,7 +32,7 @@ export function CategoryGrid() {
             to={`/browse?category=${cat.slug}`}
             className="flex flex-col items-center gap-2 rounded-xl border bg-card p-4 transition-shadow hover:shadow-md hover:border-primary/30"
           >
-            <span className="text-3xl">{cat.icon}</span>
+            <DynamicIcon name={cat.icon} className="h-7 w-7 text-primary" />
             <span className="text-xs font-medium text-center text-foreground leading-tight">
               {cat.name_en}
             </span>
