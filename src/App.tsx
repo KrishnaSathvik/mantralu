@@ -12,6 +12,7 @@ import MantraDetail from "./pages/MantraDetail";
 import SearchPage from "./pages/SearchPage";
 import Favorites from "./pages/Favorites";
 import Settings from "./pages/Settings";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ function AnimatedRoutes() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
