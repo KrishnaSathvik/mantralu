@@ -159,35 +159,35 @@ const MantraDetail = () => {
 
           {/* Font Size Control */}
           <motion.div custom={1} initial="hidden" animate="visible" variants={sectionVariants}
-            className="flex items-center gap-3 rounded-lg border bg-card/60 p-2.5"
+            className="flex items-center gap-3 rounded-xl border bg-card/60 px-3 py-2.5"
           >
-            <span className="text-xs text-muted-foreground font-medium">A</span>
+            <span className="text-xs text-muted-foreground font-medium select-none">A</span>
             <Slider value={[fontSize]} onValueChange={([v]) => setFontSize(v)} min={16} max={36} step={1} className="flex-1" />
-            <span className="text-base font-bold text-muted-foreground">A</span>
+            <span className="text-base font-bold text-muted-foreground select-none">A</span>
             <span className="text-[10px] text-muted-foreground w-7 text-right tabular-nums">{fontSize}</span>
           </motion.div>
 
           {/* View Mode Toggle (only for verse-based mantras) */}
           {hasVerses && (
             <motion.div custom={1.5} initial="hidden" animate="visible" variants={sectionVariants}
-              className="flex rounded-lg border bg-card/60 p-1 gap-1"
+              className="view-toggle-group"
             >
               {([
-                { key: "interleaved", label: "All" },
-                { key: "telugu", label: "తెలుగు" },
-                { key: "transliteration", label: "English" },
-              ] as const).map(({ key, label }) => (
+                { key: "interleaved", label: "All", icon: "📖" },
+                { key: "telugu", label: "తెలుగు", icon: "🕉" },
+                { key: "transliteration", label: "English", icon: "Aa" },
+              ] as const).map(({ key, label, icon }) => (
                 <button
                   key={key}
                   onClick={() => setViewMode(key)}
                   className={cn(
-                    "flex-1 text-xs font-medium rounded-md py-1.5 transition-all",
+                    "view-toggle-btn",
                     viewMode === key
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "view-toggle-btn--active"
+                      : "view-toggle-btn--inactive"
                   )}
                 >
-                  {label}
+                  <span className="mr-1">{icon}</span> {label}
                 </button>
               ))}
             </motion.div>
@@ -195,39 +195,40 @@ const MantraDetail = () => {
 
           {/* === VERSE-BASED CONTENT === */}
           {hasVerses ? (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {viewMode === "interleaved" ? (
-                // Interleaved: each verse as a complete card
                 verses.map((verse, i) => (
                   <VerseDisplay key={verse.id} verse={verse} fontSize={fontSize} language={language} index={i} />
                 ))
               ) : viewMode === "telugu" ? (
-                // Telugu only: continuous text
                 <motion.section custom={2} initial="hidden" animate="visible" variants={sectionVariants}
-                  className="rounded-xl border bg-card p-5 space-y-4"
+                  className="rounded-xl border bg-card p-5 border-l-[3px] border-l-primary/35"
                 >
-                  {verses.map((verse) => (
-                    <div key={verse.id}>
-                      <span className="verse-number-badge mb-1.5 block">{verse.verse_number}</span>
-                      <p className="font-telugu leading-[2] text-foreground whitespace-pre-line" style={{ fontSize: `${fontSize}px` }}>
-                        {verse.telugu}
-                      </p>
-                    </div>
-                  ))}
+                  <div className="space-y-5">
+                    {verses.map((verse) => (
+                      <div key={verse.id}>
+                        <span className="verse-number-badge mb-2 block">{verse.verse_number}</span>
+                        <p className="font-telugu leading-[2.1] text-foreground whitespace-pre-line tracking-wide" style={{ fontSize: `${fontSize}px` }}>
+                          {verse.telugu}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </motion.section>
               ) : (
-                // Transliteration only
                 <motion.section custom={2} initial="hidden" animate="visible" variants={sectionVariants}
-                  className="rounded-xl border bg-card p-5 space-y-4"
+                  className="rounded-xl border bg-card p-5 border-l-[3px] border-l-primary/35"
                 >
-                  {verses.map((verse) => (
-                    <div key={verse.id}>
-                      <span className="verse-number-badge mb-1.5 block">{verse.verse_number}</span>
-                      <p className="italic leading-[1.8] text-foreground/90 whitespace-pre-line" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
-                        {verse.transliteration}
-                      </p>
-                    </div>
-                  ))}
+                  <div className="space-y-5">
+                    {verses.map((verse) => (
+                      <div key={verse.id}>
+                        <span className="verse-number-badge mb-2 block">{verse.verse_number}</span>
+                        <p className="leading-[1.9] text-foreground/85 whitespace-pre-line" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
+                          {verse.transliteration}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </motion.section>
               )}
             </div>
