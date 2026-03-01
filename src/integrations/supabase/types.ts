@@ -14,7 +14,194 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          mantra_count: number
+          name_en: string
+          name_te: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          mantra_count?: number
+          name_en: string
+          name_te: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          mantra_count?: number
+          name_en?: string
+          name_te?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      deities: {
+        Row: {
+          created_at: string
+          description_en: string | null
+          description_te: string | null
+          icon: string
+          id: string
+          image_url: string | null
+          name_en: string
+          name_te: string
+        }
+        Insert: {
+          created_at?: string
+          description_en?: string | null
+          description_te?: string | null
+          icon?: string
+          id?: string
+          image_url?: string | null
+          name_en: string
+          name_te: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string | null
+          description_te?: string | null
+          icon?: string
+          id?: string
+          image_url?: string | null
+          name_en?: string
+          name_te?: string
+        }
+        Relationships: []
+      }
+      mantra_verses: {
+        Row: {
+          created_at: string
+          id: string
+          mantra_id: string
+          meaning_en: string | null
+          meaning_te: string | null
+          telugu: string
+          transliteration: string | null
+          verse_number: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mantra_id: string
+          meaning_en?: string | null
+          meaning_te?: string | null
+          telugu: string
+          transliteration?: string | null
+          verse_number: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mantra_id?: string
+          meaning_en?: string | null
+          meaning_te?: string | null
+          telugu?: string
+          transliteration?: string | null
+          verse_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mantra_verses_mantra_id_fkey"
+            columns: ["mantra_id"]
+            isOneToOne: false
+            referencedRelation: "mantras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mantras: {
+        Row: {
+          benefits: Json | null
+          category_id: string | null
+          chant_count: number | null
+          created_at: string
+          deity_id: string | null
+          id: string
+          is_published: boolean
+          meaning_en: string
+          meaning_te: string | null
+          slug: string
+          sort_order: number
+          source_ref: string | null
+          tags: string[] | null
+          telugu_text: string
+          title_en: string
+          title_te: string
+          transliteration: string
+          updated_at: string
+          when_to_chant: string | null
+        }
+        Insert: {
+          benefits?: Json | null
+          category_id?: string | null
+          chant_count?: number | null
+          created_at?: string
+          deity_id?: string | null
+          id?: string
+          is_published?: boolean
+          meaning_en: string
+          meaning_te?: string | null
+          slug: string
+          sort_order?: number
+          source_ref?: string | null
+          tags?: string[] | null
+          telugu_text: string
+          title_en: string
+          title_te: string
+          transliteration: string
+          updated_at?: string
+          when_to_chant?: string | null
+        }
+        Update: {
+          benefits?: Json | null
+          category_id?: string | null
+          chant_count?: number | null
+          created_at?: string
+          deity_id?: string | null
+          id?: string
+          is_published?: boolean
+          meaning_en?: string
+          meaning_te?: string | null
+          slug?: string
+          sort_order?: number
+          source_ref?: string | null
+          tags?: string[] | null
+          telugu_text?: string
+          title_en?: string
+          title_te?: string
+          transliteration?: string
+          updated_at?: string
+          when_to_chant?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mantras_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mantras_deity_id_fkey"
+            columns: ["deity_id"]
+            isOneToOne: false
+            referencedRelation: "deities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
