@@ -125,3 +125,39 @@
     padding-right: var(--safe-area-right);
   }
 }
+
+@layer components {
+  .verse-card {
+    @apply relative rounded-xl border bg-card p-5;
+  }
+  .verse-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 3px;
+    border-radius: 2px;
+    background: hsl(var(--primary) / 0.3);
+  }
+  .verse-number-badge {
+    @apply inline-flex items-center justify-center rounded-full text-[10px] font-bold tabular-nums;
+    width: 22px;
+    height: 22px;
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--primary));
+  }
+  .section-divider {
+    @apply flex items-center gap-3 my-1;
+  }
+  .section-divider::before,
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: hsl(var(--border));
+  }
+  .section-divider span {
+    @apply text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-semibold whitespace-nowrap;
+  }
+}
