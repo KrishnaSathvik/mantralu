@@ -105,3 +105,31 @@ export function useCategories() {
     },
   });
 }
+
+export interface DbMantraVerse {
+  id: string;
+  mantra_id: string;
+  verse_number: number;
+  telugu: string;
+  transliteration: string | null;
+  meaning_en: string | null;
+  meaning_te: string | null;
+  created_at: string;
+}
+
+export function useMantraVerses(mantraId: string | undefined) {
+  return useQuery({
+    queryKey: ["mantra-verses", mantraId],
+    queryFn: async () => {
+      if (!mantraId) return [];
+      const { data, error } = await supabase
+        .from("mantra_verses")
+        .select("*")
+        .eq("mantra_id", mantraId)
+        .order("verse_number");
+      if (error) throw error;
+      return data as unknown as DbMantraVerse[];
+    },
+    enabled: !!mantraId,
+  });
+}
