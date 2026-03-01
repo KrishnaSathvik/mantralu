@@ -1,4 +1,4 @@
-import { mantras } from "@/data/sample-mantras";
+import { useMantras } from "@/hooks/use-mantras";
 import { useSettings } from "@/hooks/use-settings";
 import { MantraCard } from "@/components/MantraCard";
 import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
@@ -7,7 +7,8 @@ import { Link } from "react-router-dom";
 
 const Favorites = () => {
   const { favorites } = useSettings();
-  const favMantras = mantras.filter((m) => favorites.includes(m.id));
+  const { data: mantras } = useMantras();
+  const favMantras = mantras?.filter((m) => favorites.includes(m.id)) || [];
 
   return (
     <PageTransition>

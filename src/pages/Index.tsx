@@ -3,14 +3,17 @@ import { SearchBar } from "@/components/SearchBar";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { MantraCard } from "@/components/MantraCard";
 import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
-import { mantras } from "@/data/sample-mantras";
+import { useMantras } from "@/hooks/use-mantras";
 import { useSettings } from "@/hooks/use-settings";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const { recentlyViewed } = useSettings();
+  const { data: mantras, isLoading } = useMantras();
+
   const recentMantras = recentlyViewed
-    .map((id) => mantras.find((m) => m.id === id))
-    .filter(Boolean) as typeof mantras;
+    .map((id) => mantras?.find((m) => m.id === id))
+    .filter(Boolean) as NonNullable<typeof mantras>;
 
   return (
     <PageTransition>
@@ -48,13 +51,21 @@ const Index = () => {
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground mb-3">All Mantras</h2>
-            <StaggerContainer className="space-y-2.5">
-              {mantras.map((m) => (
-                <StaggerItem key={m.id}>
-                  <MantraCard mantra={m} />
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
+            {isLoading ? (
+              <div className="space-y-2.5">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-24 rounded-lg" />
+                ))}
+              </div>
+            ) : (
+              <StaggerContainer className="space-y-2.5">
+                {mantras?.map((m) => (
+                  <StaggerItem key={m.id}>
+                    <MantraCard mantra={m} />
+                  </StaggerItem>
+                ))}
+              </StaggerContainer>
+            )}
           </section>
         </main>
       </div>
