@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useMantraBySlug } from "@/hooks/use-mantras";
+import { useMantraBySlug, useMantraVerses } from "@/hooks/use-mantras";
 import { useSettings } from "@/hooks/use-settings";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Heart, Share2, Copy, Check } from "lucide-react";
@@ -22,6 +22,7 @@ const sectionVariants = {
 const MantraDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: mantra, isLoading } = useMantraBySlug(slug);
+  const { data: verses = [] } = useMantraVerses(mantra?.id);
   const { fontSize, setFontSize, addRecentlyViewed, favorites, toggleFavorite, language } = useSettings();
   const [copied, setCopied] = useState(false);
 
@@ -134,24 +135,61 @@ const MantraDetail = () => {
           {(language === "te" || language === "both") && (
             <motion.section custom={2} initial="hidden" animate="visible" variants={sectionVariants} className="rounded-xl border bg-card p-5">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3">Telugu Text</h3>
-              <p className="font-telugu leading-[1.9] text-foreground whitespace-pre-line" style={{ fontSize: `${fontSize}px` }}>
-                {mantra.telugu_text}
-              </p>
+              {verses.length > 0 ? (
+                <div className="space-y-4">
+                  {verses.map((verse) => (
+                    <div key={verse.id} className="border-b border-border/50 pb-3 last:border-0 last:pb-0">
+                      <span className="text-[10px] font-medium text-muted-foreground mb-1 block">Verse {verse.verse_number}</span>
+                      <p className="font-telugu leading-[1.9] text-foreground whitespace-pre-line" style={{ fontSize: `${fontSize}px` }}>
+                        {verse.telugu}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="font-telugu leading-[1.9] text-foreground whitespace-pre-line" style={{ fontSize: `${fontSize}px` }}>
+                  {mantra.telugu_text}
+                </p>
+              )}
             </motion.section>
           )}
 
           {(language === "en" || language === "both") && (
             <motion.section custom={3} initial="hidden" animate="visible" variants={sectionVariants} className="rounded-xl border bg-card p-5">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3">Transliteration</h3>
-              <p className="italic leading-[1.8] text-foreground/90 whitespace-pre-line" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
-                {mantra.transliteration}
-              </p>
+              {verses.length > 0 ? (
+                <div className="space-y-4">
+                  {verses.map((verse) => (
+                    <div key={verse.id} className="border-b border-border/50 pb-3 last:border-0 last:pb-0">
+                      <span className="text-[10px] font-medium text-muted-foreground mb-1 block">Verse {verse.verse_number}</span>
+                      <p className="italic leading-[1.8] text-foreground/90 whitespace-pre-line" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
+                        {verse.transliteration}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="italic leading-[1.8] text-foreground/90 whitespace-pre-line" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
+                  {mantra.transliteration}
+                </p>
+              )}
             </motion.section>
           )}
 
           <motion.section custom={4} initial="hidden" animate="visible" variants={sectionVariants} className="rounded-xl border bg-card p-5">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3">Meaning</h3>
-            <p className="text-base leading-relaxed text-foreground/85">{mantra.meaning_en}</p>
+            {verses.length > 0 ? (
+              <div className="space-y-4">
+                {verses.filter(v => v.meaning_en).map((verse) => (
+                  <div key={verse.id} className="border-b border-border/50 pb-3 last:border-0 last:pb-0">
+                    <span className="text-[10px] font-medium text-muted-foreground mb-1 block">Verse {verse.verse_number}</span>
+                    <p className="text-base leading-relaxed text-foreground/85">{verse.meaning_en}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-base leading-relaxed text-foreground/85">{mantra.meaning_en}</p>
+            )}
           </motion.section>
 
           {benefits.length > 0 && (
