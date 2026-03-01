@@ -26,6 +26,7 @@ const MantraDetail = () => {
   const mantra = mantras.find((m) => m.slug === slug);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (mantra) addRecentlyViewed(mantra.id);
   }, [mantra?.id]);
 
