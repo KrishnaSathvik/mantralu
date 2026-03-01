@@ -199,10 +199,9 @@ const MantraDetail = () => {
               <motion.section custom={2} initial="hidden" animate="visible" variants={sectionVariants}
                 className="rounded-xl border bg-card p-5 border-l-[3px] border-l-primary/35"
               >
-                <div className="space-y-5">
+                <div className="space-y-3">
                   {verses.map((verse) => (
                     <div key={verse.id}>
-                      <span className="verse-number-badge mb-2 block">{verse.verse_number}</span>
                       {viewMode === "telugu" ? (
                         <p className="font-telugu leading-[2.1] text-foreground whitespace-pre-line tracking-wide" style={{ fontSize: `${fontSize}px` }}>
                           {verse.telugu}
@@ -217,31 +216,20 @@ const MantraDetail = () => {
                 </div>
               </motion.section>
 
-              {/* Meanings after all verses */}
-              {verses.some(v => viewMode === "telugu" ? v.meaning_te : v.meaning_en) && (
-                <motion.section custom={3} initial="hidden" animate="visible" variants={sectionVariants}
-                  className="rounded-xl border bg-card p-5"
-                >
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3 flex items-center gap-1.5">
-                    <Sparkles className="h-3 w-3" /> {viewMode === "telugu" ? "అర్థం" : "Meaning"}
-                  </h3>
-                  <div className="space-y-4">
-                    {verses.map((verse) => {
-                      const meaning = viewMode === "telugu" ? (verse.meaning_te || verse.meaning_en) : verse.meaning_en;
-                      if (!meaning) return null;
-                      return (
-                        <div key={verse.id} className="flex gap-2.5">
-                          <span className="verse-number-badge shrink-0 mt-0.5">{verse.verse_number}</span>
-                          <p className={cn(
-                            "text-sm leading-relaxed text-foreground/85",
-                            viewMode === "telugu" && "font-telugu"
-                          )}>{meaning}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </motion.section>
-              )}
+              {/* Meaning after all verses */}
+              <motion.section custom={3} initial="hidden" animate="visible" variants={sectionVariants}
+                className="rounded-xl border bg-card p-5"
+              >
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3 flex items-center gap-1.5">
+                  <Sparkles className="h-3 w-3" /> {viewMode === "telugu" ? "అర్థం" : "Meaning"}
+                </h3>
+                <p className={cn(
+                  "text-sm leading-relaxed text-foreground/85",
+                  viewMode === "telugu" && "font-telugu"
+                )}>
+                  {viewMode === "telugu" ? (mantra.meaning_te || mantra.meaning_en) : mantra.meaning_en}
+                </p>
+              </motion.section>
 
               {/* Benefits */}
               {benefits.length > 0 && (
