@@ -9,9 +9,9 @@ export function DynamicIcon({ name, ...props }: DynamicIconProps) {
   const pascalName = name
     .split("-")
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join("") as keyof typeof icons;
+    .join("");
 
-  const LucideIcon = icons[pascalName];
+  const LucideIcon = (icons as Record<string, any>)[pascalName];
 
   if (!LucideIcon) {
     // Fallback: render as text (handles any leftover emojis gracefully)
