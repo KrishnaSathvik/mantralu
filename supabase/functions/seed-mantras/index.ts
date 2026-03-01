@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { scraped_data, mantra_sources, batch_start = 0, batch_size = 5 } = await req.json();
+    const { scraped_data, mantra_sources, batch_start = 0, batch_size = 2 } = await req.json();
 
     // Get existing deities and categories for FK mapping
     const { data: deities } = await supabase.from("deities").select("id, name_en");
@@ -64,99 +64,104 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Build AI prompt for this batch
-    const mantrasToGenerate = newSlugs.map((slug) => {
+    // Process ONE mantra at a time to avoid truncation
+    const inserted: any[] = [];
+    for (const slug of newSlugs) {
       const source = mantra_sources[slug];
       const scraped = scraped_data?.[slug] || "";
-      return {
-        slug,
-        ...source,
-        scraped_text: scraped ? scraped.substring(0, 3000) : "No scraped text available",
-      };
-    });
+      const scrapedSnippet = scraped ? scraped.substring(0, 2000) : "";
 
-    const prompt = `You are a Hindu scripture expert. Generate complete mantra data for these mantras.
+      const prompt = `Generate mantra data for: "${source.title_en}" (${source.title_te})
 
-For each mantra, provide:
-1. telugu_text: The COMPLETE mantra/stotra in Telugu script. If scraped text is provided, use it as reference but ensure proper Telugu script.
-2. transliteration: IAST/English transliteration of the Telugu text
-3. meaning_en: English translation/meaning
-4. benefits: Array of 3-5 benefits of chanting this mantra
-5. when_to_chant: When and how to chant this mantra
+${scrapedSnippet ? `Reference text (use as basis for Telugu):\n${scrapedSnippet}\n` : ""}
 
-CRITICAL: The Telugu text must be accurate and complete. Use the scraped reference text when available.
+Return a single JSON object (no markdown, no code fences) with these fields:
+- "telugu_text": The mantra in Telugu script. For SHORT mantras (1-4 lines), give the complete text. For LONG stotras (like Sahasranama, Chalisa), give the first 8-10 key verses only with "..." at end.
+- "transliteration": English transliteration (IAST style)
+- "meaning_en": English meaning/translation (2-4 sentences for short mantras, summary for long ones)
+- "benefits": Array of 3-4 short benefit strings
+- "when_to_chant": One sentence about when to chant
 
-Mantras to generate:
-${JSON.stringify(mantrasToGenerate, null, 2)}
+IMPORTANT: Keep response concise. Output ONLY the JSON object, nothing else.`;
 
-Respond with a JSON array (no markdown, just raw JSON) where each object has:
-{ "slug": "...", "telugu_text": "...", "transliteration": "...", "meaning_en": "...", "benefits": ["..."], "when_to_chant": "..." }`;
+      try {
+        const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: "You are a Hindu scripture expert. Return ONLY valid JSON, no markdown." },
+              { role: "user", content: prompt },
+            ],
+            max_tokens: 2000,
+          }),
+        });
 
-    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: "You are a Hindu scripture and Sanskrit/Telugu expert. Return ONLY valid JSON arrays, no markdown formatting." },
-          { role: "user", content: prompt },
-        ],
-      }),
-    });
+        if (!aiResp.ok) {
+          console.error(`AI error for ${slug}: ${aiResp.status}`);
+          continue;
+        }
 
-    if (!aiResp.ok) {
-      const errText = await aiResp.text();
-      throw new Error(`AI gateway error ${aiResp.status}: ${errText}`);
+        const aiData = await aiResp.json();
+        let content = aiData.choices?.[0]?.message?.content || "";
+        content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+
+        let parsed: any;
+        try {
+          parsed = JSON.parse(content);
+        } catch {
+          // Try to salvage truncated JSON by closing it
+          try {
+            // Find last complete field
+            const lastQuote = content.lastIndexOf('"');
+            const truncated = content.substring(0, lastQuote + 1) + '}';
+            parsed = JSON.parse(truncated);
+          } catch {
+            console.error(`Failed to parse for ${slug}, skipping`);
+            continue;
+          }
+        }
+
+        const row = {
+          slug,
+          title_en: source.title_en,
+          title_te: source.title_te,
+          deity_id: deityMap[source.deity] || null,
+          category_id: catMap[source.category] || null,
+          telugu_text: parsed.telugu_text || source.title_te,
+          transliteration: parsed.transliteration || "",
+          meaning_en: parsed.meaning_en || "",
+          benefits: parsed.benefits || [],
+          when_to_chant: parsed.when_to_chant || null,
+          tags: source.tags,
+          is_published: false,
+          sort_order: (batch_start + newSlugs.indexOf(slug)) * 10,
+        };
+
+        const { data: ins, error: insErr } = await supabase
+          .from("mantras")
+          .insert(row)
+          .select("id, slug, title_en");
+
+        if (insErr) {
+          console.error(`Insert error for ${slug}:`, insErr);
+        } else if (ins) {
+          inserted.push(...ins);
+        }
+      } catch (e) {
+        console.error(`Error processing ${slug}:`, e);
+      }
     }
-
-    const aiData = await aiResp.json();
-    let content = aiData.choices?.[0]?.message?.content || "";
-
-    // Strip markdown code fences if present
-    content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-
-    let generatedMantras: any[];
-    try {
-      generatedMantras = JSON.parse(content);
-    } catch {
-      throw new Error(`Failed to parse AI response: ${content.substring(0, 200)}`);
-    }
-
-    // Insert into DB
-    const inserts = generatedMantras.map((m: any, idx: number) => {
-      const source = mantra_sources[m.slug];
-      return {
-        slug: m.slug,
-        title_en: source.title_en,
-        title_te: source.title_te,
-        deity_id: deityMap[source.deity] || null,
-        category_id: catMap[source.category] || null,
-        telugu_text: m.telugu_text,
-        transliteration: m.transliteration,
-        meaning_en: m.meaning_en,
-        benefits: m.benefits || [],
-        when_to_chant: m.when_to_chant || null,
-        tags: source.tags,
-        is_published: false, // Draft — needs review
-        sort_order: (batch_start + idx) * 10,
-      };
-    });
-
-    const { data: inserted, error: insertError } = await supabase
-      .from("mantras")
-      .insert(inserts)
-      .select("id, slug, title_en");
-
-    if (insertError) throw insertError;
 
     return new Response(
       JSON.stringify({
         success: true,
-        processed: inserted?.length || 0,
-        mantras: inserted?.map((m: any) => m.title_en),
+        processed: inserted.length,
+        mantras: inserted.map((m: any) => m.title_en),
         next_batch_start: batch_start + batch_size,
         remaining: allSlugs.length - (batch_start + batch_size),
       }),

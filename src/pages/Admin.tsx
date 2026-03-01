@@ -73,7 +73,7 @@ export default function Admin() {
     }
     setSeeding(true);
     let batchStart = 0;
-    const batchSize = 5;
+    const batchSize = 2;
     let totalProcessed = 0;
 
     try {
