@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/hooks/use-settings";
 import type { DbMantra } from "@/hooks/use-mantras";
+import { DynamicIcon } from "@/components/DynamicIcon";
 
 interface MantraCardProps {
   mantra: DbMantra;
@@ -36,13 +37,13 @@ export function MantraCard({ mantra, compact }: MantraCardProps) {
             )}
             <div className="mt-2 flex flex-wrap gap-1.5">
               {mantra.deity && (
-                <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                  {mantra.deity.icon} {mantra.deity.name_en}
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                  <DynamicIcon name={mantra.deity.icon} className="h-3 w-3" /> {mantra.deity.name_en}
                 </span>
               )}
               {mantra.category && (
-                <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
-                  {mantra.category.icon} {mantra.category.name_en}
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                  <DynamicIcon name={mantra.category.icon} className="h-3 w-3" /> {mantra.category.name_en}
                 </span>
               )}
             </div>

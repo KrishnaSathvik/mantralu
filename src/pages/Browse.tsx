@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
+import { DynamicIcon } from "@/components/DynamicIcon";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Browse = () => {
@@ -66,7 +67,7 @@ const Browse = () => {
               <FilterChip active={!selectedCategory} onClick={() => setSelectedCategory("")}>All</FilterChip>
               {categories?.map((c) => (
                 <FilterChip key={c.id} active={selectedCategory === c.slug} onClick={() => setSelectedCategory(selectedCategory === c.slug ? "" : c.slug)}>
-                  {c.icon} {c.name_en}
+                  <DynamicIcon name={c.icon} className="h-3.5 w-3.5" /> {c.name_en}
                 </FilterChip>
               ))}
             </div>
@@ -78,7 +79,7 @@ const Browse = () => {
               <FilterChip active={!selectedDeity} onClick={() => setSelectedDeity("")}>All</FilterChip>
               {deities?.map((d) => (
                 <FilterChip key={d.id} active={selectedDeity === d.name_en} onClick={() => setSelectedDeity(selectedDeity === d.name_en ? "" : d.name_en)}>
-                  {d.icon} {d.name_en}
+                  <DynamicIcon name={d.icon} className="h-3.5 w-3.5" /> {d.name_en}
                 </FilterChip>
               ))}
             </div>

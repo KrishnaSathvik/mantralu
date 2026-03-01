@@ -3,6 +3,7 @@ import { useMantraBySlug, useMantraVerses } from "@/hooks/use-mantras";
 import { useSettings } from "@/hooks/use-settings";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Heart, Share2, Copy, Check, BookOpen, Sparkles, Clock, Hash } from "lucide-react";
+import { DynamicIcon } from "@/components/DynamicIcon";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
@@ -127,7 +128,7 @@ const MantraDetail = () => {
             
             <div className="flex items-start gap-3 mb-3">
               {mantra.deity && (
-                <span className="text-3xl shrink-0">{mantra.deity.icon}</span>
+                <DynamicIcon name={mantra.deity.icon} className="h-7 w-7 text-primary shrink-0" />
               )}
               <div className="min-w-0">
                 <h2 className="font-display text-xl font-bold text-foreground leading-tight">{mantra.title_en}</h2>
@@ -142,8 +143,8 @@ const MantraDetail = () => {
                 </span>
               )}
               {mantra.category && (
-                <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
-                  {mantra.category.icon} {mantra.category.name_en}
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                  <DynamicIcon name={mantra.category.icon} className="h-3 w-3" /> {mantra.category.name_en}
                 </span>
               )}
               {hasVerses && (

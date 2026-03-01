@@ -303,7 +303,7 @@ export default function Admin() {
                       <div className="flex gap-1.5 mt-1 flex-wrap">
                         {mantra.deity && (
                           <Badge variant="secondary" className="text-xs">
-                            {mantra.deity.icon} {mantra.deity.name_en}
+                            {mantra.deity.name_en}
                           </Badge>
                         )}
                         {mantra.category && (
