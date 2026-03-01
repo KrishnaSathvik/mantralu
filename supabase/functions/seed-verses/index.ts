@@ -21,14 +21,15 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { mantra_slug, batch_start = 0, batch_size = 10 } = await req.json();
+    const { mantra_slug, total_verses, batch_start = 0, batch_size = 8 } = await req.json();
 
     if (!mantra_slug) throw new Error("mantra_slug is required");
+    if (!total_verses) throw new Error("total_verses is required");
 
     // Get the mantra
     const { data: mantra, error: mantraErr } = await supabase
       .from("mantras")
-      .select("id, title_en, slug")
+      .select("id, title_en, title_te, slug")
       .eq("slug", mantra_slug)
       .single();
 
@@ -45,16 +46,13 @@ Deno.serve(async (req) => {
 
     // Determine which verses to generate in this batch
     const versesToGenerate: number[] = [];
-    for (let i = batch_start + 1; i <= batch_start + batch_size; i++) {
+    for (let i = batch_start + 1; i <= Math.min(batch_start + batch_size, total_verses); i++) {
       if (!existingNumbers.has(i)) {
         versesToGenerate.push(i);
       }
     }
 
-    // For Hanuman Chalisa: 2 dohas (opening) + 40 chaupais + 1 doha (closing) = 43 total
-    const totalVerses = mantra_slug === "hanuman-chalisa" ? 43 : 40;
-
-    if (batch_start >= totalVerses) {
+    if (batch_start >= total_verses) {
       return new Response(
         JSON.stringify({ success: true, message: "All verses complete", processed: 0, remaining: 0 }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -68,7 +66,7 @@ Deno.serve(async (req) => {
           message: "All verses in this batch already exist",
           processed: 0,
           next_batch_start: batch_start + batch_size,
-          remaining: Math.max(0, totalVerses - (batch_start + batch_size)),
+          remaining: Math.max(0, total_verses - (batch_start + batch_size)),
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -77,20 +75,17 @@ Deno.serve(async (req) => {
     const startVerse = versesToGenerate[0];
     const endVerse = versesToGenerate[versesToGenerate.length - 1];
 
-    const prompt = `Generate verses ${startVerse} to ${endVerse} of the Hanuman Chalisa in a JSON array.
+    const prompt = `Generate verses ${startVerse} to ${endVerse} of "${mantra.title_en}" (${mantra.title_te}).
 
-The Hanuman Chalisa structure:
-- Verse 1-2: Opening Dohas
-- Verses 3-42: The 40 Chaupais (main verses)
-- Verse 43: Closing Doha
+Total verses in this work: ${total_verses}.
 
 Return a JSON array (no markdown, no code fences) where each element has:
-- "verse_number": integer
-- "telugu": The verse in Telugu script (authentic, complete)
+- "verse_number": integer (${startVerse} to ${endVerse})
+- "telugu": The verse in Telugu script (authentic, complete, 2-4 lines per verse)
 - "transliteration": IAST transliteration
 - "meaning_en": English meaning (1-2 sentences)
 
-IMPORTANT: Return ONLY the JSON array. Each verse should be 2-4 lines of Telugu text. Be authentic and complete.`;
+IMPORTANT: Return ONLY the JSON array. Be authentic and accurate with the Telugu text.`;
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -101,7 +96,7 @@ IMPORTANT: Return ONLY the JSON array. Each verse should be 2-4 lines of Telugu 
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are a Hindu scripture expert specializing in Hanuman Chalisa. Return ONLY valid JSON arrays." },
+          { role: "system", content: `You are a Hindu scripture expert. You know the complete authentic text of ${mantra.title_en} in Telugu. Return ONLY valid JSON arrays.` },
           { role: "user", content: prompt },
         ],
         max_tokens: 4000,
@@ -109,7 +104,8 @@ IMPORTANT: Return ONLY the JSON array. Each verse should be 2-4 lines of Telugu 
     });
 
     if (!aiResp.ok) {
-      throw new Error(`AI error: ${aiResp.status}`);
+      const errText = await aiResp.text();
+      throw new Error(`AI error ${aiResp.status}: ${errText.substring(0, 200)}`);
     }
 
     const aiData = await aiResp.json();
@@ -126,7 +122,8 @@ IMPORTANT: Return ONLY the JSON array. Each verse should be 2-4 lines of Telugu 
         const truncated = content.substring(0, lastBracket + 1) + "]";
         verses = JSON.parse(truncated);
       } catch {
-        throw new Error(`Failed to parse AI response: ${content.substring(0, 200)}`);
+        console.error(`Failed to parse for ${mantra_slug}:`, content.substring(0, 300));
+        throw new Error(`Failed to parse AI response for ${mantra_slug}`);
       }
     }
 
@@ -134,8 +131,23 @@ IMPORTANT: Return ONLY the JSON array. Each verse should be 2-4 lines of Telugu 
       throw new Error("AI response is not an array");
     }
 
+    // Filter out any verses that already exist (double-check)
+    const newVerses = verses.filter((v: any) => !existingNumbers.has(v.verse_number));
+
+    if (newVerses.length === 0) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          processed: 0,
+          next_batch_start: batch_start + batch_size,
+          remaining: Math.max(0, total_verses - (batch_start + batch_size)),
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Insert verses
-    const rows = verses.map((v: any) => ({
+    const rows = newVerses.map((v: any) => ({
       mantra_id: mantra.id,
       verse_number: v.verse_number,
       telugu: v.telugu || "",
@@ -150,7 +162,7 @@ IMPORTANT: Return ONLY the JSON array. Each verse should be 2-4 lines of Telugu 
 
     if (insErr) throw new Error(`Insert error: ${insErr.message}`);
 
-    const remaining = Math.max(0, totalVerses - (batch_start + batch_size));
+    const remaining = Math.max(0, total_verses - (batch_start + batch_size));
 
     return new Response(
       JSON.stringify({
