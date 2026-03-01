@@ -115,32 +115,90 @@ export default function Admin() {
     }
   };
 
-  // Seed verses for long mantras
-  const handleSeedVerses = async (slug: string) => {
-    setSeedingVerses(true);
+  // Long mantras that need verse-by-verse content
+  const LONG_MANTRAS: { slug: string; verses: number }[] = [
+    { slug: "hanuman-chalisa", verses: 43 },
+    { slug: "vishnu-sahasranama", verses: 30 },
+    { slug: "lalitha-sahasranama", verses: 30 },
+    { slug: "suprabhatam", verses: 29 },
+    { slug: "aditya-hrudayam", verses: 31 },
+    { slug: "shiva-tandava-stotram", verses: 13 },
+    { slug: "lingashtakam", verses: 8 },
+    { slug: "bilvashtakam", verses: 9 },
+    { slug: "kanakadhara-stotram", verses: 21 },
+    { slug: "ganesh-atharvashirsha", verses: 10 },
+    { slug: "navagraha-stotram", verses: 9 },
+    { slug: "sankatanashana-ganesh-stotram", verses: 12 },
+    { slug: "rama-raksha-stotram", verses: 20 },
+    { slug: "krishna-ashtakam", verses: 8 },
+    { slug: "bhagavad-gita-ch12", verses: 20 },
+    { slug: "mahishasura-mardini", verses: 21 },
+    { slug: "bajrang-baan", verses: 20 },
+    { slug: "sri-suktam", verses: 16 },
+    { slug: "purusha-suktam", verses: 16 },
+    { slug: "narayana-suktam", verses: 12 },
+    { slug: "durga-suktam", verses: 10 },
+    { slug: "medha-suktam", verses: 10 },
+    { slug: "pratah-smarana", verses: 6 },
+    { slug: "om-jai-jagdish", verses: 9 },
+    { slug: "ganesh-aarti", verses: 6 },
+    { slug: "shiva-aarti", verses: 6 },
+    { slug: "hanuman-aarti", verses: 6 },
+    { slug: "lakshmi-aarti", verses: 6 },
+    { slug: "rama-ashtottara", verses: 12 },
+    { slug: "govinda-namavali", verses: 10 },
+    { slug: "devi-stuti", verses: 8 },
+    { slug: "sashti-kavacham", verses: 10 },
+  ];
+
+  // Seed verses for a single mantra
+  const seedVersesForMantra = async (slug: string, totalVerses: number): Promise<number> => {
     let batchStart = 0;
-    const batchSize = 10;
+    const batchSize = 8;
     let totalProcessed = 0;
 
+    while (true) {
+      const { data, error } = await supabase.functions.invoke("seed-verses", {
+        body: { mantra_slug: slug, total_verses: totalVerses, batch_start: batchStart, batch_size: batchSize },
+      });
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Seeding failed");
+
+      totalProcessed += data.processed || 0;
+
+      if (data.remaining <= 0) break;
+      batchStart = data.next_batch_start;
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+    return totalProcessed;
+  };
+
+  // Seed verses for ALL long mantras
+  const handleSeedAllVerses = async () => {
+    setSeedingVerses(true);
+    let grandTotal = 0;
+
     try {
-      while (true) {
-        setProgress(`Seeding verses for ${slug}: batch at ${batchStart}... (${totalProcessed} so far)`);
-        const { data, error } = await supabase.functions.invoke("seed-verses", {
-          body: { mantra_slug: slug, batch_start: batchStart, batch_size: batchSize },
-        });
-        if (error) throw error;
-        if (!data?.success) throw new Error(data?.error || "Seeding failed");
+      for (let i = 0; i < LONG_MANTRAS.length; i++) {
+        const { slug, verses } = LONG_MANTRAS[i];
+        setProgress(`[${i + 1}/${LONG_MANTRAS.length}] Seeding verses for ${slug} (${verses} verses)... Total so far: ${grandTotal}`);
 
-        totalProcessed += data.processed || 0;
-        setProgress(`Verses ${data.verses_inserted?.join(", ") || "skipped"}. Total: ${totalProcessed}. Remaining: ${data.remaining}`);
+        try {
+          const count = await seedVersesForMantra(slug, verses);
+          grandTotal += count;
+          setProgress(`[${i + 1}/${LONG_MANTRAS.length}] ${slug}: ${count} new verses. Grand total: ${grandTotal}`);
+        } catch (e: any) {
+          console.error(`Error seeding ${slug}:`, e);
+          setProgress(`[${i + 1}/${LONG_MANTRAS.length}] ${slug}: ERROR - ${e.message}. Continuing...`);
+        }
 
-        if (data.remaining <= 0) break;
-        batchStart = data.next_batch_start;
-        await new Promise((r) => setTimeout(r, 2000));
+        if (i < LONG_MANTRAS.length - 1) {
+          await new Promise((r) => setTimeout(r, 1500));
+        }
       }
 
-      setProgress(`Done! ${totalProcessed} verses seeded for ${slug}.`);
-      toast({ title: "Verses seeded!", description: `${totalProcessed} verses for ${slug}` });
+      setProgress(`All done! ${grandTotal} total new verses seeded across ${LONG_MANTRAS.length} mantras.`);
+      toast({ title: "All verses seeded!", description: `${grandTotal} verses across ${LONG_MANTRAS.length} mantras` });
       queryClient.invalidateQueries({ queryKey: ["mantra-verses"] });
     } catch (e: any) {
       setProgress(`Verse seeding error: ${e.message}`);
@@ -192,9 +250,9 @@ export default function Admin() {
               {seeding ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
               2. AI Seed Mantras
             </Button>
-            <Button onClick={() => handleSeedVerses("hanuman-chalisa")} disabled={seedingVerses} variant="outline">
+            <Button onClick={handleSeedAllVerses} disabled={seedingVerses} variant="outline">
               {seedingVerses ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
-              3. Seed Chalisa Verses
+              3. Seed All Verses
             </Button>
           </div>
 
