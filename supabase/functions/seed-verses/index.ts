@@ -131,8 +131,8 @@ IMPORTANT: Return ONLY the JSON array. Be authentic and accurate with the Telugu
       throw new Error("AI response is not an array");
     }
 
-    // Filter out any verses that already exist (double-check)
-    const newVerses = verses.filter((v: any) => !existingNumbers.has(v.verse_number));
+    // Filter out any verses that already exist or have missing verse_number
+    const newVerses = verses.filter((v: any) => v.verse_number != null && !existingNumbers.has(v.verse_number));
 
     if (newVerses.length === 0) {
       return new Response(
