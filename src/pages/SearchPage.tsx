@@ -2,6 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { useState, useMemo, useEffect } from "react";
 import { mantras } from "@/data/sample-mantras";
 import { MantraCard } from "@/components/MantraCard";
+import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
 import { Search, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -29,48 +30,52 @@ const SearchPage = () => {
   }, [query]);
 
   return (
-    <div className="min-h-screen pb-24">
-      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md px-4 py-3">
-        <div className="mx-auto max-w-lg flex items-center gap-3">
-          <Link to="/" className="text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search mantras..."
-              autoFocus
-              className="w-full rounded-xl border bg-card pl-10 pr-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-            />
+    <PageTransition>
+      <div className="min-h-screen pb-24">
+        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md px-4 py-3 safe-area-top safe-area-x">
+          <div className="mx-auto max-w-lg flex items-center gap-3">
+            <Link to="/" className="text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search mantras..."
+                autoFocus
+                className="w-full rounded-xl border bg-card pl-10 pr-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              />
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="mx-auto max-w-lg px-4 py-5 space-y-2.5">
-        {query.trim() ? (
-          results.length > 0 ? (
-            <>
-              <p className="text-sm text-muted-foreground mb-3">{results.length} result{results.length !== 1 ? "s" : ""}</p>
-              {results.map((m) => (
-                <MantraCard key={m.id} mantra={m} />
-              ))}
-            </>
+        <main className="mx-auto max-w-lg px-4 py-5 safe-area-x">
+          {query.trim() ? (
+            results.length > 0 ? (
+              <>
+                <p className="text-sm text-muted-foreground mb-3">{results.length} result{results.length !== 1 ? "s" : ""}</p>
+                <StaggerContainer className="space-y-2.5">
+                  {results.map((m) => (
+                    <StaggerItem key={m.id}>
+                      <MantraCard mantra={m} />
+                    </StaggerItem>
+                  ))}
+                </StaggerContainer>
+              </>
+            ) : (
+              <p className="text-center text-muted-foreground py-12">No results for "{query}"</p>
+            )
           ) : (
-            <p className="text-center text-muted-foreground py-12">
-              No results for "{query}"
-            </p>
-          )
-        ) : (
-          <div className="text-center py-12">
-            <Search className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-            <p className="text-muted-foreground">Search for mantras, prayers, and stotras</p>
-          </div>
-        )}
-      </main>
-    </div>
+            <div className="text-center py-12">
+              <Search className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
+              <p className="text-muted-foreground">Search for mantras, prayers, and stotras</p>
+            </div>
+          )}
+        </main>
+      </div>
+    </PageTransition>
   );
 };
 
