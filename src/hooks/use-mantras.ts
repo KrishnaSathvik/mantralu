@@ -13,7 +13,9 @@ export interface DbMantra {
   meaning_en: string;
   meaning_te: string | null;
   benefits: string[];
+  benefits_te: string[] | null;
   when_to_chant: string | null;
+  when_to_chant_te: string | null;
   chant_count: number | null;
   source_ref: string | null;
   tags: string[];
