@@ -128,24 +128,19 @@
 
 @layer components {
   .verse-card {
-    @apply relative rounded-xl border bg-card p-5;
+    @apply relative rounded-xl border bg-card px-5 py-4;
+    border-left: 3px solid hsl(var(--primary) / 0.35);
   }
-  .verse-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 12px;
-    bottom: 12px;
-    width: 3px;
-    border-radius: 2px;
-    background: hsl(var(--primary) / 0.3);
+  .verse-card + .verse-card {
+    margin-top: 0.5rem;
   }
   .verse-number-badge {
     @apply inline-flex items-center justify-center rounded-full text-[10px] font-bold tabular-nums;
-    width: 22px;
-    height: 22px;
-    background: hsl(var(--primary) / 0.12);
+    width: 24px;
+    height: 24px;
+    background: hsl(var(--primary) / 0.1);
     color: hsl(var(--primary));
+    letter-spacing: -0.02em;
   }
   .section-divider {
     @apply flex items-center gap-3 my-1;
@@ -159,5 +154,19 @@
   }
   .section-divider span {
     @apply text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-semibold whitespace-nowrap;
+  }
+
+  /* View mode toggle pills */
+  .view-toggle-group {
+    @apply flex rounded-xl border bg-card/60 p-1 gap-0.5;
+  }
+  .view-toggle-btn {
+    @apply flex-1 text-xs font-semibold rounded-lg py-2 transition-all duration-200;
+  }
+  .view-toggle-btn--active {
+    @apply bg-primary text-primary-foreground shadow-sm;
+  }
+  .view-toggle-btn--inactive {
+    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/50;
   }
 }
