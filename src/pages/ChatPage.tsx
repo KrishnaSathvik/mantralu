@@ -33,6 +33,8 @@ function formatTime(ts: number) {
 const ChatPage = () => {
   const [sessions, setSessions] = useState(loadSessions);
   const [activeId, setActiveId] = useState<string | null>(() => getActiveSessionId());
+  const activeIdRef = useRef(activeId);
+  activeIdRef.current = activeId;
   const activeSession = sessions.find((s) => s.id === activeId);
   const messages = activeSession?.messages ?? [];
 
@@ -79,15 +81,14 @@ const ChatPage = () => {
     setActiveSessionId(activeId);
   }, [activeId]);
 
-  const setMessages = (updater: Msg[] | ((prev: Msg[]) => Msg[])) => {
+  const updateMessages = useCallback((sessionId: string, updater: Msg[] | ((prev: Msg[]) => Msg[])) => {
     setSessions((prevSessions) => {
-      if (!activeId) return prevSessions;
-      const session = prevSessions.find((s) => s.id === activeId);
+      const session = prevSessions.find((s) => s.id === sessionId);
       const currentMsgs = session?.messages ?? [];
       const newMsgs = typeof updater === "function" ? updater(currentMsgs) : updater;
-      return updateSession(prevSessions, activeId, newMsgs);
+      return updateSession(prevSessions, sessionId, newMsgs);
     });
-  };
+  }, []);
 
   const handleNewChat = () => {
     const newSession = createNewSession();
@@ -192,7 +193,7 @@ const ChatPage = () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       setStreamingContent("");
       pendingContentRef.current = "";
-      setMessages((prev) => {
+      updateMessages(currentId!, (prev) => {
         const last = prev[prev.length - 1];
         if (last?.role === "assistant" && last.timestamp === 0) {
           return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar, timestamp: Date.now() } : m));
@@ -203,7 +204,7 @@ const ChatPage = () => {
       console.error("Chat error:", e);
       toast.error(e.message || "Failed to get response");
       if (!assistantSoFar) {
-        setMessages((prev) => prev.slice(0, -1));
+        updateMessages(currentId!, (prev) => prev.slice(0, -1));
       }
     } finally {
       setIsLoading(false);
