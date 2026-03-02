@@ -19,6 +19,9 @@ const deityImageMap: Record<string, string> = {
   Lakshmi: "/images/deities/lakshmi.jpg",
   Saraswati: "/images/deities/saraswati.jpg",
   Durga: "/images/deities/durga.jpg",
+  Rama: "/images/deities/rama.jpg",
+  Krishna: "/images/deities/krishna.jpg",
+  Subramanya: "/images/deities/subramanya.jpg",
   Universal: "/images/deities/default.jpg",
 };
 
