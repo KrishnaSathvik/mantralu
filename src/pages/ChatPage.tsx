@@ -65,9 +65,11 @@ const ChatPage = () => {
     saveHistory(messages);
   }, [messages]);
 
-  // Scroll to bottom on mount
+  // Scroll to top on mount (when returning to chat page)
   useEffect(() => {
-    scrollToBottom("instant");
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: "instant" });
+    }
   }, []);
 
   const handleClear = () => {
