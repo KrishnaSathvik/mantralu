@@ -1,8 +1,6 @@
 import { useSettings } from "@/hooks/use-settings";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { PageTransition } from "@/components/PageTransition";
 
@@ -23,9 +21,6 @@ const Settings = () => {
       <div className="min-h-screen pb-20">
         <header className="page-header">
           <div className="page-header-inner">
-            <Link to="/" className="page-back-btn">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
             <h1 className="page-title">Settings</h1>
           </div>
         </header>
