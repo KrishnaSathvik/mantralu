@@ -61,7 +61,7 @@ const Browse = () => {
                 <ArrowLeft className="h-5 w-5" />
               </Link>
               <div>
-                <h1 className="font-display text-xl font-bold text-foreground">
+                <h1 className="font-display text-xl sm:text-2xl text-foreground">
                   {activeCategory ? activeCategory.name_en : "Browse"}
                 </h1>
                 {activeCategory && (
@@ -229,7 +229,7 @@ const Browse = () => {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
                 <Filter className="h-7 w-7 text-muted-foreground" />
               </div>
-              <p className="font-display text-lg font-semibold text-foreground mb-1">
+              <p className="font-display text-xl text-foreground mb-1">
                 No mantras found
               </p>
               <p className="text-sm text-muted-foreground mb-4">

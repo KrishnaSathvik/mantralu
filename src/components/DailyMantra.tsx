@@ -45,7 +45,7 @@ export function DailyMantra() {
             Mantra of the Day
           </span>
         </div>
-        <h2 className="font-display text-lg sm:text-xl font-bold text-foreground mb-0.5 leading-snug">
+        <h2 className="font-display text-xl sm:text-2xl text-foreground mb-1 leading-snug">
           {mantra.title_en}
         </h2>
         <p className="font-telugu text-base sm:text-lg text-muted-foreground mb-3">
