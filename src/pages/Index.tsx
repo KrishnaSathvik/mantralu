@@ -1,5 +1,5 @@
 import { DailyMantra } from "@/components/DailyMantra";
-import { SearchBar } from "@/components/SearchBar";
+
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { MantraCard } from "@/components/MantraCard";
 import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
@@ -28,7 +28,7 @@ const Index = () => {
         </header>
 
         <main className="mx-auto max-w-lg px-4 py-5 space-y-6 safe-area-x">
-          <SearchBar />
+          
           <DailyMantra />
 
           <section>
