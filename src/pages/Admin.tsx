@@ -6,31 +6,43 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2, Play, Eye, EyeOff, RefreshCw, ArrowLeft, Plus, Pencil, Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Loader2, Play, Eye, EyeOff, RefreshCw, ArrowLeft, Plus, Pencil, Search, LogOut } from "lucide-react";
+import { Link, Navigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { PageTransition } from "@/components/PageTransition";
 import { MantraEditor } from "@/components/admin/MantraEditor";
 import { DbMantra } from "@/hooks/use-mantras";
+import { useAdminAuth } from "@/hooks/use-admin-auth";
 
 type ViewMode = "list" | "edit" | "create";
 
 export default function Admin() {
   const queryClient = useQueryClient();
+  const { user, isAdmin, loading: authLoading, signOut } = useAdminAuth();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [editingMantra, setEditingMantra] = useState<DbMantra | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Pipeline state
   const [scraping, setScraping] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [seedingVerses, setSeedingVerses] = useState(false);
   const [progress, setProgress] = useState("");
   const [scrapedData, setScrapedData] = useState<any>(null);
-
-  // Mantras list
   const [allMantras, setAllMantras] = useState<any[]>([]);
   const [loadingMantras, setLoadingMantras] = useState(false);
+
+  // Redirect if not authenticated or not admin
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  if (!user || !isAdmin) {
+    return <Navigate to="/admin-login" replace />;
+  }
+
+
 
   const fetchAllMantras = async () => {
     setLoadingMantras(true);
@@ -220,7 +232,10 @@ export default function Admin() {
           <Link to="/" className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <h1 className="font-display text-2xl font-bold text-foreground">Content Admin</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground flex-1">Content Admin</h1>
+          <Button variant="ghost" size="sm" onClick={signOut} title="Sign out">
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* Pipeline Controls */}
