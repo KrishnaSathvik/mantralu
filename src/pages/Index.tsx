@@ -18,9 +18,9 @@ const Index = () => {
         <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md safe-area-top safe-area-x">
           <div className="mx-auto max-w-lg px-4 py-3">
             <h1 className="font-display text-[26px] sm:text-3xl text-foreground">
-              Mantra<span className="text-primary">Vani</span>
+              మంత్రా<span className="text-primary">లు</span>
             </h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5 tracking-wide font-heading italic">Sacred Prayers & Mantras</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5 tracking-wide font-heading italic">Sacred Telugu Mantras for Daily Devotion</p>
           </div>
         </header>
 
