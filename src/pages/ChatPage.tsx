@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, Loader2, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -40,16 +40,35 @@ const ChatPage = () => {
   const [messages, setMessages] = useState<Msg[]>(loadHistory);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    requestAnimationFrame(() => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTo({
+          top: scrollContainerRef.current.scrollHeight,
+          behavior,
+        });
+      }
+    });
+  }, []);
+
+  // Scroll on new messages and during streaming
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     saveHistory(messages);
   }, [messages]);
+
+  // Scroll to bottom on mount
+  useEffect(() => {
+    scrollToBottom("instant");
+  }, []);
 
   const handleClear = () => {
     setMessages([]);
@@ -66,8 +85,8 @@ const ChatPage = () => {
     setMessages(updatedMsgs);
     setInput("");
     setIsLoading(true);
+    setIsStreaming(false);
 
-    // Resize textarea back
     if (inputRef.current) inputRef.current.style.height = "auto";
 
     let assistantSoFar = "";
@@ -97,6 +116,7 @@ const ChatPage = () => {
 
       const upsert = (chunk: string) => {
         assistantSoFar += chunk;
+        if (!isStreaming) setIsStreaming(true);
         const content = assistantSoFar;
         setMessages((prev) => {
           const last = prev[prev.length - 1];
@@ -131,19 +151,18 @@ const ChatPage = () => {
         }
       }
 
-      // Finalize timestamp
       setMessages((prev) =>
         prev.map((m, i) => (i === prev.length - 1 && m.timestamp === 0 ? { ...m, timestamp: Date.now() } : m))
       );
     } catch (e: any) {
       console.error("Chat error:", e);
       toast.error(e.message || "Failed to get response");
-      // Remove the user message if no response came
       if (!assistantSoFar) {
         setMessages((prev) => prev.slice(0, -1));
       }
     } finally {
       setIsLoading(false);
+      setIsStreaming(false);
     }
   };
 
@@ -167,7 +186,7 @@ const ChatPage = () => {
     <PageTransition>
       <div className="flex flex-col h-screen overflow-hidden">
         {/* Header */}
-        <header className="page-header">
+        <header className="page-header shrink-0">
           <div className="page-header-inner justify-between">
             <h1 className="page-title">మంత్రాలు Guide</h1>
             {messages.length > 0 && (
@@ -183,8 +202,8 @@ const ChatPage = () => {
         </header>
 
         {/* Messages area */}
-        <div className="flex-1 overflow-y-auto pb-32">
-          <div className="mx-auto max-w-lg px-4 py-4 safe-area-x space-y-3">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto scrollbar-none">
+          <div className="mx-auto max-w-lg px-4 pt-4 pb-36 safe-area-x">
             {showStarters ? (
               <div className="flex flex-col items-center pt-8">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl mb-4">
@@ -209,25 +228,33 @@ const ChatPage = () => {
                 </div>
               </div>
             ) : (
-              <AnimatePresence initial={false}>
+              <div className="space-y-4">
                 {messages.map((msg, i) => (
                   <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 8 }}
+                    key={`${i}-${msg.timestamp}`}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}
+                    transition={{ duration: 0.15 }}
+                    className={cn(
+                      "flex",
+                      msg.role === "user" ? "justify-end" : "justify-start"
+                    )}
                   >
+                    {msg.role === "assistant" && (
+                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0 mt-1 mr-2">
+                        🕉️
+                      </div>
+                    )}
                     <div
                       className={cn(
-                        "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
+                        "rounded-2xl text-[13.5px] leading-[1.7]",
                         msg.role === "user"
-                          ? "bg-primary text-primary-foreground rounded-br-md"
-                          : "bg-card border rounded-bl-md"
+                          ? "bg-primary text-primary-foreground px-4 py-2.5 rounded-br-md max-w-[80%]"
+                          : "bg-card border px-4 py-3 rounded-bl-md max-w-[88%]"
                       )}
                     >
                       {msg.role === "assistant" ? (
-                        <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-headings:my-2 prose-headings:text-foreground prose-strong:text-foreground">
+                        <div className="chat-markdown">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div>
                       ) : (
@@ -236,8 +263,10 @@ const ChatPage = () => {
                       {msg.timestamp > 0 && (
                         <p
                           className={cn(
-                            "text-[10px] mt-1",
-                            msg.role === "user" ? "text-primary-foreground/60 text-right" : "text-muted-foreground"
+                            "text-[10px] mt-1.5 select-none",
+                            msg.role === "user"
+                              ? "text-primary-foreground/50 text-right"
+                              : "text-muted-foreground/60"
                           )}
                         >
                           {formatTime(msg.timestamp)}
@@ -246,22 +275,25 @@ const ChatPage = () => {
                     </div>
                   </motion.div>
                 ))}
-              </AnimatePresence>
-            )}
 
-            {/* Typing indicator */}
-            {isLoading && messages[messages.length - 1]?.role === "user" && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex justify-start"
-              >
-                <div className="bg-card border rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "300ms" }} />
-                </div>
-              </motion.div>
+                {/* Typing indicator — shown while waiting for first token */}
+                {isLoading && !isStreaming && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex justify-start"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0 mt-1 mr-2">
+                      🕉️
+                    </div>
+                    <div className="bg-card border rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+                    </div>
+                  </motion.div>
+                )}
+              </div>
             )}
 
             <div ref={bottomRef} />
@@ -269,7 +301,7 @@ const ChatPage = () => {
         </div>
 
         {/* Input area */}
-        <div className="fixed bottom-[calc(3.5rem+max(0.5rem,var(--safe-area-bottom)))] left-0 right-0 z-40 border-t bg-background/95 backdrop-blur-md">
+        <div className="shrink-0 border-t bg-background/95 backdrop-blur-md pb-[calc(3.5rem+max(0.5rem,var(--safe-area-bottom)))]">
           <div className="mx-auto max-w-lg px-3 py-2.5 safe-area-x flex items-end gap-2">
             <textarea
               ref={inputRef}

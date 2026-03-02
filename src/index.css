@@ -253,4 +253,42 @@
   .page-main {
     @apply mx-auto max-w-lg px-4 py-5 safe-area-x;
   }
+
+
+  /* Chat markdown — compact, clean AI responses */
+  .chat-markdown {
+    @apply text-foreground/90;
+  }
+  .chat-markdown p {
+    @apply my-1.5 first:mt-0 last:mb-0;
+  }
+  .chat-markdown strong {
+    @apply text-foreground font-semibold;
+  }
+  .chat-markdown h1, .chat-markdown h2, .chat-markdown h3 {
+    @apply font-display text-foreground mt-3 mb-1.5 first:mt-0;
+  }
+  .chat-markdown h1 { @apply text-base; }
+  .chat-markdown h2 { @apply text-[15px]; }
+  .chat-markdown h3 { @apply text-[14px]; }
+  .chat-markdown ul, .chat-markdown ol {
+    @apply my-1.5 pl-4 space-y-1;
+  }
+  .chat-markdown ul { list-style-type: disc; }
+  .chat-markdown ol { list-style-type: decimal; }
+  .chat-markdown li {
+    @apply text-foreground/85;
+  }
+  .chat-markdown li::marker {
+    color: hsl(var(--primary));
+  }
+  .chat-markdown code {
+    @apply bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-foreground;
+  }
+  .chat-markdown blockquote {
+    @apply border-l-2 border-primary/30 pl-3 my-2 italic text-foreground/70;
+  }
+  .chat-markdown hr {
+    @apply my-3 border-border;
+  }
 }
