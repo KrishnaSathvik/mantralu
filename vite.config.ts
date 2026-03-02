@@ -23,9 +23,9 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/~oauth/],
       },
       manifest: {
-        name: "MantraVani — Sacred Prayers & Mantras",
-        short_name: "MantraVani",
-        description: "Browse Hindu mantras, prayers, and stotras in Telugu and English",
+        name: "మంత్రాలు — Sacred Telugu Mantras",
+        short_name: "మంత్రాలు",
+        description: "Sacred Telugu mantras for daily devotion",
         theme_color: "#E8731A",
         background_color: "#FFFCF7",
         display: "standalone",
