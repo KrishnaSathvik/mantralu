@@ -40,6 +40,11 @@ export function CategoryGrid() {
             <span className="font-telugu text-[10px] sm:text-xs text-muted-foreground text-center leading-tight">
               {cat.name_te}
             </span>
+            {cat.mantra_count > 0 && (
+              <span className="text-[10px] tabular-nums font-medium text-primary/70">
+                {cat.mantra_count} {cat.mantra_count === 1 ? "mantra" : "mantras"}
+              </span>
+            )}
           </Link>
         </motion.div>
       ))}
