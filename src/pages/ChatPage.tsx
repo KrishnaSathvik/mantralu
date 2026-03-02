@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { PageTransition } from "@/components/PageTransition";
 import { toast } from "sonner";
+import { getUserName } from "@/lib/device";
 import {
   Msg,
   loadSessions,
@@ -144,6 +145,7 @@ const ChatPage = () => {
         },
         body: JSON.stringify({
           messages: updatedMsgs.map((m) => ({ role: m.role, content: m.content })),
+          userName: getUserName(),
         }),
       });
 
@@ -268,6 +270,7 @@ const ChatPage = () => {
   };
 
   const showStarters = messages.length === 0;
+  const currentUserName = getUserName();
 
   return (
     <PageTransition>
@@ -297,7 +300,9 @@ const ChatPage = () => {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl mb-4">
                   🙏
                 </div>
-                <h2 className="font-display text-xl text-foreground mb-1">నమస్కారం!</h2>
+                <h2 className="font-display text-xl text-foreground mb-1">
+                  {currentUserName ? `నమస్కారం ${currentUserName}!` : "నమస్కారం!"}
+                </h2>
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
                   Ask me about mantras, their meanings, spiritual practices, or anything devotional
                 </p>
