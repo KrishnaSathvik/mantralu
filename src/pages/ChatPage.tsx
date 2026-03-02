@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, Send, Loader2, Trash2 } from "lucide-react";
+import { Send, Loader2, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
@@ -169,21 +168,8 @@ const ChatPage = () => {
       <div className="flex flex-col h-screen overflow-hidden">
         {/* Header */}
         <header className="page-header">
-          <div className="mx-auto max-w-lg px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <Link to="/" className="page-back-btn">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-base shrink-0">
-                  🕉️
-                </div>
-                <div className="min-w-0">
-                  <h1 className="font-display text-lg text-foreground truncate">మంత్రాలు Guide</h1>
-                  <p className="text-[10px] text-muted-foreground leading-none">Spiritual AI Assistant</p>
-                </div>
-              </div>
-            </div>
+          <div className="page-header-inner justify-between">
+            <h1 className="page-title">మంత్రాలు Guide</h1>
             {messages.length > 0 && (
               <motion.button
                 whileTap={{ scale: 0.9 }}
