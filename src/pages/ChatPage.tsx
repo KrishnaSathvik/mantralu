@@ -203,7 +203,7 @@ const ChatPage = () => {
 
         {/* Messages area */}
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto scrollbar-none">
-          <div className="mx-auto max-w-lg px-4 pt-4 pb-36 safe-area-x">
+          <div className="mx-auto max-w-lg px-4 pt-4 pb-4 safe-area-x">
             {showStarters ? (
               <div className="flex flex-col items-center pt-8">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl mb-4">
