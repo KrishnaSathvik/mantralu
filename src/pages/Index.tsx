@@ -16,7 +16,7 @@ const Index = () => {
       <div className="min-h-screen pb-20">
         {/* Header */}
         <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md safe-area-top safe-area-x">
-          <div className="mx-auto max-w-lg px-4 py-3">
+          <div className="mx-auto max-w-lg px-5 sm:px-6 py-3">
             <h1 className="font-display text-[26px] sm:text-3xl text-foreground">
               మంత్రా<span className="text-primary">లు</span>
             </h1>
@@ -24,7 +24,7 @@ const Index = () => {
           </div>
         </header>
 
-        <main className="page-main space-y-7 pb-4">
+        <main className="page-main space-y-8 pb-4">
           {/* Daily Mantra */}
           <DailyMantra />
 

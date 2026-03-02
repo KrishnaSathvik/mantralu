@@ -79,7 +79,7 @@ const Settings = () => {
           </div>
         </header>
 
-        <main className="page-main space-y-4">
+        <main className="page-main space-y-5">
           {/* User Profile */}
           <motion.div custom={0} initial="hidden" animate="visible" variants={cardVariants} className="rounded-xl border bg-card p-4 sm:p-5">
             <div className="flex items-center gap-3">
