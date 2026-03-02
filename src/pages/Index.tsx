@@ -36,18 +36,6 @@ const Index = () => {
             <CategoryGrid />
           </section>
 
-          {recentMantras.length > 0 && (
-            <section>
-              <h2 className="font-display text-lg font-semibold text-foreground mb-3">Recently Viewed</h2>
-              <StaggerContainer className="space-y-2.5">
-                {recentMantras.slice(0, 3).map((m) => (
-                  <StaggerItem key={m.id}>
-                    <MantraCard mantra={m} compact />
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            </section>
-          )}
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground mb-3">All Mantras</h2>
