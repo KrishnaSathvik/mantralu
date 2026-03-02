@@ -11,6 +11,7 @@ import Browse from "./pages/Browse";
 import MantraDetail from "./pages/MantraDetail";
 import SearchPage from "./pages/SearchPage";
 import Favorites from "./pages/Favorites";
+import ChatPage from "./pages/ChatPage";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -28,6 +29,7 @@ function AnimatedRoutes() {
         <Route path="/mantra/:slug" element={<MantraDetail />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/favorites" element={<Favorites />} />
+        <Route path="/chat" element={<ChatPage />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />

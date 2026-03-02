@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.seed-mantras]
 verify_jwt = false
+
+[functions.spiritual-chat]
+verify_jwt = false
