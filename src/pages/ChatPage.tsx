@@ -45,8 +45,10 @@ const ChatPage = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const pendingContentRef = useRef("");
+  // Typewriter: received content buffer vs displayed content
+  const receivedRef = useRef("");
+  const displayedIndexRef = useRef(0);
+  const typewriterRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     requestAnimationFrame(() => {
@@ -71,6 +73,13 @@ const ChatPage = () => {
     }
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Auto-scroll during streaming typewriter
+  useEffect(() => {
+    if (streamingContent) {
+      scrollToBottom();
+    }
+  }, [streamingContent, scrollToBottom]);
 
   // Persist sessions
   useEffect(() => {
@@ -149,19 +158,26 @@ const ChatPage = () => {
       const decoder = new TextDecoder();
       let buffer = "";
 
-      const flushContent = () => {
-        setStreamingContent(pendingContentRef.current);
-        rafRef.current = null;
+      // Start typewriter interval — reveals received content smoothly
+      const startTypewriter = () => {
+        if (typewriterRef.current) return;
+        typewriterRef.current = setInterval(() => {
+          const received = receivedRef.current;
+          const currentIdx = displayedIndexRef.current;
+          if (currentIdx < received.length) {
+            // Reveal 2-4 chars per tick for natural speed
+            const charsToReveal = Math.min(3, received.length - currentIdx);
+            displayedIndexRef.current = currentIdx + charsToReveal;
+            setStreamingContent(received.slice(0, displayedIndexRef.current));
+          }
+        }, 15);
       };
 
       const upsert = (chunk: string) => {
         assistantSoFar += chunk;
-        pendingContentRef.current = assistantSoFar;
+        receivedRef.current = assistantSoFar;
         if (!isStreaming) setIsStreaming(true);
-        // Throttle UI updates to animation frames for smooth streaming
-        if (!rafRef.current) {
-          rafRef.current = requestAnimationFrame(flushContent);
-        }
+        startTypewriter();
       };
 
       while (true) {
@@ -188,10 +204,24 @@ const ChatPage = () => {
         }
       }
 
-      // Final flush — commit streaming content to session storage
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      // Wait for typewriter to finish revealing remaining content
+      await new Promise<void>((resolve) => {
+        const finishInterval = setInterval(() => {
+          if (displayedIndexRef.current >= receivedRef.current.length) {
+            clearInterval(finishInterval);
+            resolve();
+          }
+        }, 20);
+      });
+
+      // Cleanup and commit
+      if (typewriterRef.current) {
+        clearInterval(typewriterRef.current);
+        typewriterRef.current = null;
+      }
       setStreamingContent("");
-      pendingContentRef.current = "";
+      receivedRef.current = "";
+      displayedIndexRef.current = 0;
       updateMessages(currentId!, (prev) => {
         const last = prev[prev.length - 1];
         if (last?.role === "assistant" && last.timestamp === 0) {
@@ -202,8 +232,20 @@ const ChatPage = () => {
     } catch (e: any) {
       console.error("Chat error:", e);
       toast.error(e.message || "Failed to get response");
+      if (typewriterRef.current) {
+        clearInterval(typewriterRef.current);
+        typewriterRef.current = null;
+      }
+      setStreamingContent("");
+      receivedRef.current = "";
+      displayedIndexRef.current = 0;
       if (!assistantSoFar) {
         updateMessages(currentId!, (prev) => prev.slice(0, -1));
+      } else {
+        // Save partial response
+        updateMessages(currentId!, (prev) => {
+          return [...prev, { role: "assistant" as const, content: assistantSoFar, timestamp: Date.now() }];
+        });
       }
     } finally {
       setIsLoading(false);
