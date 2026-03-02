@@ -131,6 +131,27 @@ export type Database = {
         }
         Relationships: []
       }
+      device_tokens: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          token: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          token?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           created_at: string
@@ -342,7 +363,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_device_id_from_token: { Args: { _token: string }; Returns: string }
+      requesting_device_id: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
