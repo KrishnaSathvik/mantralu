@@ -278,7 +278,7 @@ const ChatPage = () => {
         {/* Header */}
         <header className="page-header shrink-0">
           <div className="page-header-inner justify-between">
-            <h1 className="page-title">మంత్రాలు Guide</h1>
+            <h1 className="page-title">Mantras Guide</h1>
             {messages.length > 0 && (
               <motion.button
                 whileTap={{ scale: 0.9 }}
