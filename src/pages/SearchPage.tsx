@@ -4,8 +4,7 @@ import { useMantras } from "@/hooks/use-mantras";
 import { useSettings } from "@/hooks/use-settings";
 import { MantraCard } from "@/components/MantraCard";
 import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
-import { Search, ArrowLeft, Clock, TrendingUp, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Search, Clock, TrendingUp, X } from "lucide-react";
 import { scoreMantra } from "@/lib/fuzzy-search";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -87,9 +86,6 @@ const SearchPage = () => {
       <div className="min-h-screen pb-20">
         <header className="page-header">
           <div className="page-header-inner">
-            <Link to="/" className="page-back-btn">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <input

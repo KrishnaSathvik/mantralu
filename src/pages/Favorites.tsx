@@ -2,8 +2,7 @@ import { useMantras } from "@/hooks/use-mantras";
 import { useSettings } from "@/hooks/use-settings";
 import { MantraCard } from "@/components/MantraCard";
 import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
-import { Heart, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
 
 const Favorites = () => {
   const { favorites } = useSettings();
@@ -15,9 +14,6 @@ const Favorites = () => {
       <div className="min-h-screen pb-20">
         <header className="page-header">
           <div className="page-header-inner">
-            <Link to="/" className="page-back-btn">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
             <h1 className="page-title">Favorites</h1>
           </div>
         </header>
