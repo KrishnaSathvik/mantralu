@@ -1,8 +1,20 @@
+import { useState } from "react";
 import { useSettings } from "@/hooks/use-settings";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/PageTransition";
+import { MessageSquare, Trash2, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  loadSessions,
+  saveSessions,
+  deleteSession,
+  setActiveSessionId,
+  formatRelativeTime,
+  type ChatSession,
+} from "@/lib/chat-history";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -15,6 +27,27 @@ const cardVariants = {
 
 const Settings = () => {
   const { fontSize, setFontSize, darkMode, toggleDarkMode, language, setLanguage } = useSettings();
+  const [sessions, setSessions] = useState<ChatSession[]>(loadSessions);
+  const navigate = useNavigate();
+
+  const handleOpenChat = (sessionId: string) => {
+    setActiveSessionId(sessionId);
+    navigate("/chat");
+  };
+
+  const handleDeleteSession = (sessionId: string) => {
+    const updated = deleteSession(sessions, sessionId);
+    setSessions(updated);
+    saveSessions(updated);
+    toast.success("Chat deleted");
+  };
+
+  const handleClearAll = () => {
+    setSessions([]);
+    saveSessions([]);
+    setActiveSessionId(null);
+    toast.success("All chats cleared");
+  };
 
   return (
     <PageTransition>
@@ -75,7 +108,68 @@ const Settings = () => {
             </div>
           </motion.div>
 
+          {/* Chat History */}
           <motion.div custom={3} initial="hidden" animate="visible" variants={cardVariants} className="rounded-xl border bg-card p-4 sm:p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-semibold text-foreground">Chat History</h3>
+                <p className="text-sm text-muted-foreground">Your saved conversations</p>
+              </div>
+              {sessions.length > 0 && (
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleClearAll}
+                  className="text-xs text-destructive hover:text-destructive/80 transition-colors px-2 py-1 rounded-md hover:bg-destructive/10"
+                >
+                  Clear All
+                </motion.button>
+              )}
+            </div>
+
+            {sessions.length === 0 ? (
+              <div className="text-center py-6">
+                <MessageSquare className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No chat history yet</p>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <AnimatePresence>
+                  {[...sessions].reverse().map((session) => (
+                    <motion.div
+                      key={session.id}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="group flex items-center gap-2 rounded-lg hover:bg-secondary/50 transition-colors"
+                    >
+                      <button
+                        onClick={() => handleOpenChat(session.id)}
+                        className="flex-1 flex items-center gap-3 p-2.5 text-left min-w-0"
+                      >
+                        <MessageSquare className="h-4 w-4 text-primary/60 shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-foreground truncate">{session.title}</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            {session.messages.length} messages · {formatRelativeTime(session.updatedAt)}
+                          </p>
+                        </div>
+                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                      </button>
+                      <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleDeleteSession(session.id)}
+                        className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </motion.button>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </motion.div>
+
+          <motion.div custom={4} initial="hidden" animate="visible" variants={cardVariants} className="rounded-xl border bg-card p-4 sm:p-5">
             <h3 className="font-semibold text-foreground mb-1">About మంత్రాలు</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Sacred Telugu mantras for daily devotion. Browse Hindu mantras, prayers, and stotras in Telugu and English.

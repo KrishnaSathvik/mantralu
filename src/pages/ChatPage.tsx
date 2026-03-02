@@ -1,15 +1,21 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Loader2, Trash2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Send, Loader2, Plus } from "lucide-react";
+import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { PageTransition } from "@/components/PageTransition";
 import { toast } from "sonner";
-
-type Msg = { role: "user" | "assistant"; content: string; timestamp: number };
+import {
+  Msg,
+  loadSessions,
+  saveSessions,
+  getActiveSessionId,
+  setActiveSessionId,
+  createNewSession,
+  updateSession,
+} from "@/lib/chat-history";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/spiritual-chat`;
-const STORAGE_KEY = "mv-chat-history";
 
 const STARTER_PROMPTS = [
   { emoji: "🙏", text: "What mantra helps with inner peace?" },
@@ -20,24 +26,16 @@ const STARTER_PROMPTS = [
   { emoji: "🎯", text: "Best mantra for success in exams?" },
 ];
 
-function loadHistory(): Msg[] {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function saveHistory(msgs: Msg[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs.slice(-50)));
-}
-
 function formatTime(ts: number) {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 const ChatPage = () => {
-  const [messages, setMessages] = useState<Msg[]>(loadHistory);
+  const [sessions, setSessions] = useState(loadSessions);
+  const [activeId, setActiveId] = useState<string | null>(() => getActiveSessionId());
+  const activeSession = sessions.find((s) => s.id === activeId);
+  const messages = activeSession?.messages ?? [];
+
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -58,11 +56,9 @@ const ChatPage = () => {
 
   const hasScrolledOnMount = useRef(false);
 
-  // Scroll on new messages and during streaming (skip initial mount)
   useEffect(() => {
     if (!hasScrolledOnMount.current) {
       hasScrolledOnMount.current = true;
-      // Scroll to top on mount (when returning to chat page)
       if (scrollContainerRef.current) {
         scrollContainerRef.current.scrollTo({ top: 0, behavior: "instant" });
       }
@@ -71,24 +67,53 @@ const ChatPage = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  // Persist sessions
   useEffect(() => {
-    saveHistory(messages);
-  }, [messages]);
+    saveSessions(sessions);
+  }, [sessions]);
 
+  useEffect(() => {
+    setActiveSessionId(activeId);
+  }, [activeId]);
 
-  const handleClear = () => {
-    setMessages([]);
-    localStorage.removeItem(STORAGE_KEY);
-    toast.success("Chat cleared");
+  const setMessages = (updater: Msg[] | ((prev: Msg[]) => Msg[])) => {
+    setSessions((prevSessions) => {
+      if (!activeId) return prevSessions;
+      const session = prevSessions.find((s) => s.id === activeId);
+      const currentMsgs = session?.messages ?? [];
+      const newMsgs = typeof updater === "function" ? updater(currentMsgs) : updater;
+      return updateSession(prevSessions, activeId, newMsgs);
+    });
+  };
+
+  const handleNewChat = () => {
+    const newSession = createNewSession();
+    setSessions((prev) => [...prev, newSession]);
+    setActiveId(newSession.id);
+    hasScrolledOnMount.current = false;
   };
 
   const send = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
+    // Auto-create session if none active
+    let currentId = activeId;
+    if (!currentId) {
+      const newSession = createNewSession();
+      setSessions((prev) => [...prev, newSession]);
+      setActiveId(newSession.id);
+      currentId = newSession.id;
+    }
+
     const userMsg: Msg = { role: "user", content: trimmed, timestamp: Date.now() };
-    const updatedMsgs = [...messages, userMsg];
-    setMessages(updatedMsgs);
+    
+    // Get current messages for this session
+    const currentSession = sessions.find((s) => s.id === currentId);
+    const currentMsgs = currentSession?.messages ?? [];
+    const updatedMsgs = [...currentMsgs, userMsg];
+    
+    setSessions((prev) => updateSession(prev, currentId!, updatedMsgs));
     setInput("");
     setIsLoading(true);
     setIsStreaming(false);
@@ -198,10 +223,11 @@ const ChatPage = () => {
             {messages.length > 0 && (
               <motion.button
                 whileTap={{ scale: 0.9 }}
-                onClick={handleClear}
+                onClick={handleNewChat}
                 className="rounded-full p-2.5 hover:bg-secondary transition-colors"
+                title="New Chat"
               >
-                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                <Plus className="h-4 w-4 text-muted-foreground" />
               </motion.button>
             )}
           </div>
@@ -235,54 +261,54 @@ const ChatPage = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {messages.map((msg, i) => (
-                  <motion.div
-                    key={`${i}-${msg.timestamp}`}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className={cn(
-                      "flex",
-                      msg.role === "user" ? "justify-end" : "justify-start"
-                    )}
-                  >
-                    {msg.role === "assistant" && (
-                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0 mt-1 mr-2">
-                        🕉️
-                      </div>
-                    )}
-                    <div
-                      className={cn(
-                        "rounded-2xl text-[13.5px] leading-[1.7]",
-                        msg.role === "user"
-                          ? "bg-primary text-primary-foreground px-4 py-2.5 rounded-br-md max-w-[80%]"
-                          : "bg-card border px-4 py-3 rounded-bl-md max-w-[88%]"
-                      )}
+                {messages.map((msg, i) => {
+                  const isStreamingMsg = msg.role === "assistant" && msg.timestamp === 0;
+                  return (
+                    <motion.div
+                      key={`${i}-${msg.timestamp}`}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}
                     >
-                      {msg.role === "assistant" ? (
-                        <div className="chat-markdown">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      {msg.role === "assistant" && (
+                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0 mt-1 mr-2">
+                          🕉️
                         </div>
-                      ) : (
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
                       )}
-                      {msg.timestamp > 0 && (
-                        <p
-                          className={cn(
-                            "text-[10px] mt-1.5 select-none",
-                            msg.role === "user"
-                              ? "text-primary-foreground/50 text-right"
-                              : "text-muted-foreground/60"
-                          )}
-                        >
-                          {formatTime(msg.timestamp)}
-                        </p>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
+                      <div
+                        className={cn(
+                          "rounded-2xl text-[13.5px] leading-[1.7]",
+                          msg.role === "user"
+                            ? "bg-primary text-primary-foreground px-4 py-2.5 rounded-br-md max-w-[80%]"
+                            : "bg-card border px-4 py-3 rounded-bl-md max-w-[88%]"
+                        )}
+                      >
+                        {msg.role === "assistant" ? (
+                          <div className={cn("chat-markdown", isStreamingMsg && "streaming")}>
+                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                          </div>
+                        ) : (
+                          <p className="whitespace-pre-wrap">{msg.content}</p>
+                        )}
+                        {msg.timestamp > 0 && (
+                          <p
+                            className={cn(
+                              "text-[10px] mt-1.5 select-none",
+                              msg.role === "user"
+                                ? "text-primary-foreground/50 text-right"
+                                : "text-muted-foreground/60"
+                            )}
+                          >
+                            {formatTime(msg.timestamp)}
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
 
-                {/* Typing indicator — shown while waiting for first token */}
+                {/* Typing indicator */}
                 {isLoading && !isStreaming && (
                   <motion.div
                     initial={{ opacity: 0, y: 4 }}
