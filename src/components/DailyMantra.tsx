@@ -10,12 +10,15 @@ export function DailyMantra() {
 
   const mantra = useMemo(() => {
     if (!mantras?.length) return null;
-    const dayIndex = new Date().getDate() % mantras.length;
-    return mantras[dayIndex];
+    // Use day of year for better distribution
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const dayOfYear = Math.floor((now.getTime() - start.getTime()) / 86400000);
+    return mantras[dayOfYear % mantras.length];
   }, [mantras]);
 
   if (isLoading || !mantra) {
-    return <Skeleton className="h-44 rounded-xl" />;
+    return <Skeleton className="h-44 rounded-2xl" />;
   }
 
   return (
@@ -23,12 +26,14 @@ export function DailyMantra() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0, 0, 0.2, 1] }}
-      whileHover={{ y: -3 }}
     >
       <Link
         to={`/mantra/${mantra.slug}`}
-        className="block rounded-xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-card to-primary/10 p-5 transition-shadow hover:shadow-lg hover:border-primary/40"
+        className="block rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-card to-primary/10 p-5 transition-all active:scale-[0.99] hover:shadow-lg hover:border-primary/40 relative overflow-hidden"
       >
+        {/* Decorative glow */}
+        <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-primary/5 blur-2xl pointer-events-none" />
+
         <div className="flex items-center gap-2 mb-3">
           <motion.div
             animate={{ rotate: [0, 15, -15, 0] }}
@@ -36,17 +41,17 @@ export function DailyMantra() {
           >
             <Sparkles className="h-4 w-4 text-primary" />
           </motion.div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+          <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-primary">
             Mantra of the Day
           </span>
         </div>
-        <h2 className="font-display text-xl font-bold text-foreground mb-1">
+        <h2 className="font-display text-lg sm:text-xl font-bold text-foreground mb-0.5 leading-snug">
           {mantra.title_en}
         </h2>
-        <p className="font-telugu text-lg text-muted-foreground mb-3">
+        <p className="font-telugu text-base sm:text-lg text-muted-foreground mb-3">
           {mantra.title_te}
         </p>
-        <p className="font-telugu text-base leading-relaxed text-foreground/80 line-clamp-2">
+        <p className="font-telugu text-sm sm:text-base leading-relaxed text-foreground/80 line-clamp-2">
           {mantra.telugu_text.split("\n").slice(0, 2).join(" ")}
         </p>
         <p className="mt-3 text-sm font-medium text-primary">

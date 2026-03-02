@@ -32,14 +32,14 @@ const SearchPage = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen pb-24">
-        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md px-4 py-3 safe-area-top safe-area-x">
-          <div className="mx-auto max-w-lg flex items-center gap-3">
-            <Link to="/" className="text-muted-foreground hover:text-foreground">
+      <div className="min-h-screen pb-20">
+        <header className="page-header">
+          <div className="page-header-inner">
+            <Link to="/" className="page-back-btn">
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <input
                 type="text"
                 value={query}
@@ -52,12 +52,14 @@ const SearchPage = () => {
           </div>
         </header>
 
-        <main className="mx-auto max-w-lg px-4 py-5 safe-area-x">
+        <main className="page-main">
           {query.trim() ? (
             results.length > 0 ? (
               <>
-                <p className="text-sm text-muted-foreground mb-3">{results.length} result{results.length !== 1 ? "s" : ""}</p>
-                <StaggerContainer className="space-y-2.5">
+                <p className="text-sm text-muted-foreground mb-3">
+                  <span className="font-semibold text-foreground">{results.length}</span> result{results.length !== 1 ? "s" : ""}
+                </p>
+                <StaggerContainer className="space-y-3">
                   {results.map((m) => (
                     <StaggerItem key={m.id}>
                       <MantraCard mantra={m} />
@@ -66,12 +68,16 @@ const SearchPage = () => {
                 </StaggerContainer>
               </>
             ) : (
-              <p className="text-center text-muted-foreground py-12">No results for "{query}"</p>
+              <div className="text-center py-16">
+                <Search className="h-12 w-12 mx-auto text-muted-foreground/20 mb-3" />
+                <p className="text-muted-foreground">No results for "<span className="font-medium text-foreground">{query}</span>"</p>
+              </div>
             )
           ) : (
-            <div className="text-center py-12">
-              <Search className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
+            <div className="text-center py-16">
+              <Search className="h-12 w-12 mx-auto text-muted-foreground/20 mb-3" />
               <p className="text-muted-foreground">Search for mantras, prayers, and stotras</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Type in Telugu or English</p>
             </div>
           )}
         </main>

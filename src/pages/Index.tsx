@@ -4,42 +4,52 @@ import { MantraCard } from "@/components/MantraCard";
 import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
 import { useMantras } from "@/hooks/use-mantras";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 
 const Index = () => {
   const { data: mantras, isLoading } = useMantras();
-
   const topMantras = mantras?.slice(0, 10);
 
   return (
     <PageTransition>
-      <div className="min-h-screen pb-24">
-        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md px-4 py-3 safe-area-top safe-area-x">
-          <div className="mx-auto max-w-lg">
+      <div className="min-h-screen pb-20">
+        {/* Header */}
+        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md safe-area-top safe-area-x">
+          <div className="mx-auto max-w-lg px-4 py-3">
             <h1 className="font-display text-2xl font-bold text-foreground">
               Mantra<span className="text-primary">Vani</span>
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Sacred Prayers & Mantras</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5 tracking-wide">Sacred Prayers & Mantras</p>
           </div>
         </header>
 
-        <main className="mx-auto max-w-lg px-4 py-5 space-y-6 safe-area-x">
+        <main className="page-main space-y-7 pb-4">
+          {/* Daily Mantra */}
           <DailyMantra />
 
+          {/* Categories */}
           <section>
-            <h2 className="font-display text-lg font-semibold text-foreground mb-3">Categories</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-display text-lg font-semibold text-foreground">Categories</h2>
+              <Link to="/browse" className="text-xs font-medium text-primary flex items-center gap-0.5 hover:underline">
+                View all <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
             <CategoryGrid />
           </section>
 
+          {/* Top Mantras */}
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground mb-3">Top Mantras</h2>
             {isLoading ? (
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-24 rounded-lg" />
+                  <Skeleton key={i} className="h-[88px] rounded-xl" />
                 ))}
               </div>
             ) : (
-              <StaggerContainer className="space-y-2.5">
+              <StaggerContainer className="space-y-3">
                 {topMantras?.map((m) => (
                   <StaggerItem key={m.id}>
                     <MantraCard mantra={m} />
