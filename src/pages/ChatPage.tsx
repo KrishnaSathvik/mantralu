@@ -151,7 +151,6 @@ const ChatPage = () => {
 
       const flushContent = () => {
         setStreamingContent(pendingContentRef.current);
-        scrollToBottom();
         rafRef.current = null;
       };
 
@@ -322,21 +321,16 @@ const ChatPage = () => {
 
                 {/* Live streaming bubble */}
                 {isStreaming && streamingContent && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex justify-start"
-                  >
+                  <div className="flex justify-start">
                     <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0 mt-1 mr-2">
                       🕉️
                     </div>
                     <div className="bg-card border px-4 py-3 rounded-2xl rounded-bl-md max-w-[88%] text-[13.5px] leading-[1.7]">
-                      <div className="chat-markdown streaming">
+                      <div className="chat-markdown">
                         <ReactMarkdown>{streamingContent}</ReactMarkdown>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Typing indicator */}

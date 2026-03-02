@@ -291,23 +291,5 @@
   .chat-markdown hr {
     @apply my-3 border-border;
   }
-
-  /* Streaming fade-in for chat text */
-  .chat-markdown.streaming > *:last-child {
-    animation: streamFadeIn 0.3s ease-out;
-  }
-
-  @keyframes streamFadeIn {
-    from { opacity: 0.4; }
-    to { opacity: 1; }
-  }
-
-  .chat-markdown.streaming {
-    animation: textReveal 0.15s ease-out;
-  }
-
-  @keyframes textReveal {
-    from { opacity: 0.7; }
-    to { opacity: 1; }
-  }
 }
+
