@@ -10,6 +10,18 @@ import { PageTransition } from "@/components/PageTransition";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
+const deityImageMap: Record<string, string> = {
+  Ganesha: "/images/deities/ganesha.jpg",
+  Shiva: "/images/deities/shiva.jpg",
+  Vishnu: "/images/deities/vishnu.jpg",
+  Surya: "/images/deities/surya.jpg",
+  Hanuman: "/images/deities/hanuman.jpg",
+  Lakshmi: "/images/deities/lakshmi.jpg",
+  Saraswati: "/images/deities/saraswati.jpg",
+  Durga: "/images/deities/durga.jpg",
+  Universal: "/images/deities/default.jpg",
+};
+
 const sectionVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
@@ -112,43 +124,64 @@ const MantraDetail = () => {
         </header>
 
         <main className="page-main space-y-5 pb-4">
-          {/* Hero Section */}
+          {/* Hero Section with Deity Image */}
           <motion.div custom={0} initial="hidden" animate="visible" variants={sectionVariants}
-            className="rounded-2xl border bg-card p-4 sm:p-5 relative overflow-hidden"
+            className="rounded-2xl border relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 opacity-[0.04]" style={{
-              background: `radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)`,
-            }} />
-            
-            <div className="flex items-start gap-3 mb-3">
-              {mantra.deity && (
-                <div className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
-                  <DynamicIcon name={mantra.deity.icon} className="h-5 w-5 text-primary" />
+            {/* Deity background image */}
+            {(() => {
+              const deityName = mantra.deity?.name_en || "Universal";
+              const imgSrc = deityImageMap[deityName] || deityImageMap.Universal;
+              return (
+                <div className="relative">
+                  {/* Image with gradient overlay */}
+                  <div className="relative h-44 sm:h-52 overflow-hidden">
+                    <img
+                      src={imgSrc}
+                      alt={deityName}
+                      className="w-full h-full object-cover object-top"
+                      loading="eager"
+                    />
+                    {/* Gradient overlay for readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-card/40 to-transparent" />
+                  </div>
+
+                  {/* Content overlaid at bottom */}
+                  <div className="relative -mt-20 px-4 pb-4 sm:px-5 sm:pb-5">
+                    <div className="flex items-start gap-3 mb-3">
+                      {mantra.deity && (
+                        <div className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-primary/15 backdrop-blur-sm border border-primary/20">
+                          <DynamicIcon name={mantra.deity.icon} className="h-5 w-5 text-primary" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <h2 className="font-display text-xl sm:text-2xl text-foreground leading-snug drop-shadow-sm">{mantra.title_en}</h2>
+                        <p className="font-telugu text-lg sm:text-xl text-muted-foreground mt-1">{mantra.title_te}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {mantra.deity && (
+                        <span className="inline-flex items-center rounded-full bg-primary/10 backdrop-blur-sm px-2.5 py-0.5 text-[11px] font-medium text-primary">
+                          {mantra.deity.name_en}
+                        </span>
+                      )}
+                      {mantra.category && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-secondary/80 backdrop-blur-sm px-2.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
+                          <DynamicIcon name={mantra.category.icon} className="h-3 w-3" /> {mantra.category.name_en}
+                        </span>
+                      )}
+                      {mantra.tags?.slice(0, 3).map((t) => (
+                        <span key={t} className="inline-flex items-center rounded-full bg-muted/80 backdrop-blur-sm px-2.5 py-0.5 text-[11px] text-muted-foreground">
+                          #{t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              )}
-              <div className="min-w-0">
-                <h2 className="font-display text-xl sm:text-2xl text-foreground leading-snug">{mantra.title_en}</h2>
-                <p className="font-telugu text-lg sm:text-xl text-muted-foreground mt-1">{mantra.title_te}</p>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {mantra.deity && (
-                <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
-                  {mantra.deity.name_en}
-                </span>
-              )}
-              {mantra.category && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
-                  <DynamicIcon name={mantra.category.icon} className="h-3 w-3" /> {mantra.category.name_en}
-                </span>
-              )}
-              {mantra.tags?.slice(0, 3).map((t) => (
-                <span key={t} className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-[11px] text-muted-foreground">
-                  #{t}
-                </span>
-              ))}
-            </div>
+              );
+            })()}
           </motion.div>
 
           {/* View Mode Toggle */}
