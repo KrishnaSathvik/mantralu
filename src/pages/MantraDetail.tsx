@@ -95,7 +95,7 @@ const MantraDetail = () => {
               <Link to="/" className="page-back-btn">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
-              <h1 className="font-display text-base sm:text-lg font-bold text-foreground truncate">{mantra.title_en}</h1>
+              <h1 className="font-display text-lg sm:text-xl text-foreground truncate">{mantra.title_en}</h1>
             </div>
             <div className="flex items-center gap-0 shrink-0">
               <motion.button whileTap={{ scale: 0.85 }} onClick={handleShare} className="rounded-full p-2.5 hover:bg-secondary active:bg-secondary transition-colors">
@@ -127,8 +127,8 @@ const MantraDetail = () => {
                 </div>
               )}
               <div className="min-w-0">
-                <h2 className="font-display text-lg sm:text-xl font-bold text-foreground leading-snug">{mantra.title_en}</h2>
-                <p className="font-telugu text-base sm:text-lg text-muted-foreground mt-0.5">{mantra.title_te}</p>
+                <h2 className="font-display text-xl sm:text-2xl text-foreground leading-snug">{mantra.title_en}</h2>
+                <p className="font-telugu text-lg sm:text-xl text-muted-foreground mt-1">{mantra.title_te}</p>
               </div>
             </div>
             

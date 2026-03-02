@@ -15,7 +15,8 @@ export default {
     extend: {
       fontFamily: {
         telugu: ['"Noto Sans Telugu"', 'sans-serif'],
-        display: ['"Playfair Display"', 'serif'],
+        display: ['"Yatra One"', '"Tiro Devanagari Sanskrit"', 'serif'],
+        heading: ['"Tiro Devanagari Sanskrit"', 'serif'],
         sans: ['"Source Sans 3"', 'sans-serif'],
       },
       colors: {

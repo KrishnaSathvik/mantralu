@@ -26,7 +26,7 @@ export function MantraCard({ mantra, compact }: MantraCardProps) {
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h3 className="font-display text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
+            <h3 className="font-display text-[17px] sm:text-lg text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
               {mantra.title_en}
             </h3>
             {!compact && (

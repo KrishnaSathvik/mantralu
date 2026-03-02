@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700&family=Yatra+One&family=Tiro+Devanagari+Sanskrit:ital@0;1&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -116,7 +116,12 @@
   }
 
   .font-display {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Yatra One', 'Tiro Devanagari Sanskrit', serif;
+    letter-spacing: -0.01em;
+  }
+
+  .font-heading {
+    font-family: 'Tiro Devanagari Sanskrit', serif;
   }
 
   /* Better touch targets */
@@ -229,7 +234,7 @@
     @apply rounded-xl border bg-card p-4 sm:p-5;
   }
   .meta-section-title {
-    @apply text-[10px] font-semibold uppercase tracking-[0.15em] text-primary/80 mb-3 flex items-center gap-1.5;
+    @apply text-[11px] font-heading font-semibold uppercase tracking-[0.12em] text-primary/80 mb-3 flex items-center gap-1.5;
   }
 
   /* Page header shared */
@@ -243,7 +248,7 @@
     @apply text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center justify-center;
   }
   .page-title {
-    @apply font-display text-xl font-bold text-foreground;
+    @apply font-display text-xl text-foreground;
   }
   .page-main {
     @apply mx-auto max-w-lg px-4 py-5 safe-area-x;
