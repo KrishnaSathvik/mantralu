@@ -276,23 +276,13 @@ const MantraDetail = () => {
                 className="rounded-xl border bg-card p-5 border-l-[3px] border-l-primary/35"
               >
                 {viewMode === "telugu" ? (
-                  <>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3 flex items-center gap-1.5">
-                      <BookOpen className="h-3 w-3" /> తెలుగు పాఠం
-                    </h3>
-                    <p className="font-telugu leading-[2] text-foreground whitespace-pre-line text-center" style={{ fontSize: `${fontSize}px` }}>
-                      {mantra.telugu_text}
-                    </p>
-                  </>
+                  <p className="font-telugu leading-[2] text-foreground whitespace-pre-line text-center" style={{ fontSize: `${fontSize}px` }}>
+                    {mantra.telugu_text}
+                  </p>
                 ) : (
-                  <>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-3 flex items-center gap-1.5">
-                      <Hash className="h-3 w-3" /> Transliteration
-                    </h3>
-                    <p className="italic leading-[1.8] text-foreground/80 whitespace-pre-line text-center" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
-                      {mantra.transliteration}
-                    </p>
-                  </>
+                  <p className="italic leading-[1.8] text-foreground/80 whitespace-pre-line text-center" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
+                    {mantra.transliteration}
+                  </p>
                 )}
               </motion.section>
 
