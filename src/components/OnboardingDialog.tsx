@@ -61,8 +61,8 @@ export function OnboardingDialog() {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl mb-3">
                 🙏
               </div>
-              <h2 className="font-display text-xl text-foreground">Welcome to Mantras!</h2>
-              <p className="text-sm text-muted-foreground mt-1">Sacred Telugu Mantras for Daily Devotion</p>
+              <h2 className="font-display text-xl text-foreground">మంత్రాలు కి స్వాగతం!</h2>
+              <p className="text-sm text-muted-foreground mt-1">Welcome to Mantras</p>
             </div>
 
             <div className="space-y-3">

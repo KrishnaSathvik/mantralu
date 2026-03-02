@@ -43,7 +43,7 @@ export function FeedbackSection({ customIndex = 4 }: { customIndex?: number }) {
         <MessageSquareHeart className="h-4 w-4 text-primary" />
         <h3 className="font-semibold text-foreground">Send Feedback</h3>
       </div>
-      <p className="text-sm text-muted-foreground mb-3">Help us improve Mantras</p>
+      <p className="text-sm text-muted-foreground mb-3">Help us improve మంత్రాలు</p>
       <textarea
         value={feedback}
         onChange={(e) => setFeedback(e.target.value)}
@@ -102,7 +102,7 @@ export function ReviewSection({ customIndex = 5 }: { customIndex?: number }) {
         <Star className="h-4 w-4 text-primary fill-primary" />
         <h3 className="font-semibold text-foreground">Rate & Review</h3>
       </div>
-      <p className="text-sm text-muted-foreground mb-3">How's your experience with Mantras?</p>
+      <p className="text-sm text-muted-foreground mb-3">How's your experience with మంత్రాలు?</p>
 
       {/* Star rating */}
       <div className="flex items-center justify-center gap-1 mb-3">

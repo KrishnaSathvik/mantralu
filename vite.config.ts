@@ -23,8 +23,8 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/~oauth/],
       },
       manifest: {
-        name: "Mantras — Sacred Telugu Mantras",
-        short_name: "Mantras",
+        name: "మంత్రాలు — Sacred Telugu Mantras",
+        short_name: "మంత్రాలు",
         description: "Sacred Telugu mantras for daily devotion",
         theme_color: "#E8731A",
         background_color: "#FFFCF7",
