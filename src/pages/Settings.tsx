@@ -81,9 +81,9 @@ const Settings = () => {
           </motion.div>
 
           <motion.div custom={3} initial="hidden" animate="visible" variants={cardVariants} className="rounded-xl border bg-card p-4 sm:p-5">
-            <h3 className="font-semibold text-foreground mb-1">About MantraVani</h3>
+            <h3 className="font-semibold text-foreground mb-1">About మంత్రాలు</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              A devotional app for browsing Hindu mantras, prayers, and stotras in Telugu and English.
+              Sacred Telugu mantras for daily devotion. Browse Hindu mantras, prayers, and stotras in Telugu and English.
               Built with love for spiritual seekers.
             </p>
           </motion.div>
