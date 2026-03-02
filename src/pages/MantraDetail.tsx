@@ -160,15 +160,6 @@ const MantraDetail = () => {
             </div>
           </motion.div>
 
-          {/* Font Size Control */}
-          <motion.div custom={1} initial="hidden" animate="visible" variants={sectionVariants}
-            className="flex items-center gap-3 rounded-xl border bg-card/60 px-3 py-2.5"
-          >
-            <span className="text-xs text-muted-foreground font-medium select-none">A</span>
-            <Slider value={[fontSize]} onValueChange={([v]) => setFontSize(v)} min={16} max={36} step={1} className="flex-1" />
-            <span className="text-base font-bold text-muted-foreground select-none">A</span>
-            <span className="text-[10px] text-muted-foreground w-7 text-right tabular-nums">{fontSize}</span>
-          </motion.div>
 
           {/* View Mode Toggle (for all mantras) */}
           <motion.div custom={1.5} initial="hidden" animate="visible" variants={sectionVariants}
