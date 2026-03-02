@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getDeviceId, getUserName, setUserName, hasCompletedOnboarding, ensureDeviceToken } from "@/lib/device";
+import { getDeviceId, getUserName, setUserName, hasCompletedOnboarding } from "@/lib/device";
 import { toast } from "sonner";
 
 export function OnboardingDialog() {
@@ -24,8 +24,6 @@ export function OnboardingDialog() {
     setLoading(true);
 
     try {
-      // Ensure token is registered before any DB write
-      await ensureDeviceToken();
       const deviceId = getDeviceId();
       setUserName(trimmed);
 

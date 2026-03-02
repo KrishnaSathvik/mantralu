@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { getDeviceId, ensureDeviceToken } from "@/lib/device";
+import { getDeviceId } from "@/lib/device";
 
 export function useAnalytics() {
   const location = useLocation();
@@ -9,7 +9,6 @@ export function useAnalytics() {
   useEffect(() => {
     const trackView = async () => {
       try {
-        await ensureDeviceToken();
         await supabase.from("page_views").insert({
           device_id: getDeviceId(),
           page_path: location.pathname,

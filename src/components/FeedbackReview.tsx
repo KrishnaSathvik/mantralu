@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Star, Send, MessageSquareHeart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getDeviceId, getUserName, ensureDeviceToken } from "@/lib/device";
+import { getDeviceId, getUserName } from "@/lib/device";
 import { toast } from "sonner";
 
 const cardVariants = {
@@ -23,7 +23,6 @@ export function FeedbackSection({ customIndex = 4 }: { customIndex?: number }) {
     if (!trimmed || sending) return;
     setSending(true);
     try {
-      await ensureDeviceToken();
       await supabase.from("feedback").insert({
         device_id: getDeviceId(),
         user_name: getUserName(),
@@ -81,7 +80,6 @@ export function ReviewSection({ customIndex = 5 }: { customIndex?: number }) {
     }
     setSending(true);
     try {
-      await ensureDeviceToken();
       await supabase.from("reviews").insert({
         device_id: getDeviceId(),
         user_name: userName,
