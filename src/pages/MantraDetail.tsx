@@ -80,24 +80,61 @@ const MantraDetail = () => {
   const benefitsTe = Array.isArray((mantra as any).benefits_te) ? (mantra as any).benefits_te : [];
   const whenToChantTe = (mantra as any).when_to_chant_te as string | null;
 
-  const handleShare = async () => {
+  const getShareText = () => {
+    return `${mantra.title_en}\n${mantra.title_te}\n\n${mantra.telugu_text}\n\n${mantra.transliteration}\n\n${mantra.meaning_en}`;
+  };
+
+  const copyToClipboard = async (text: string) => {
     try {
-      await navigator.share({
-        title: mantra.title_en,
-        text: `${mantra.title_en} — ${mantra.transliteration}`,
-        url: window.location.href,
-      });
+      await navigator.clipboard.writeText(text);
+      return true;
     } catch {
-      handleCopy();
+      // Fallback for environments where clipboard API is unavailable
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        return true;
+      } catch {
+        return false;
+      } finally {
+        document.body.removeChild(textarea);
+      }
     }
   };
 
-  const handleCopy = () => {
-    const text = `${mantra.title_en}\n${mantra.title_te}\n\n${mantra.telugu_text}\n\n${mantra.transliteration}\n\n${mantra.meaning_en}`;
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    toast.success("Copied to clipboard");
-    setTimeout(() => setCopied(false), 2000);
+  const handleShare = async () => {
+    const shareData = {
+      title: mantra.title_en,
+      text: `${mantra.title_en} — ${mantra.transliteration}`,
+      url: window.location.href,
+    };
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (e: any) {
+        if (e?.name === "AbortError") return; // user cancelled
+      }
+    }
+    // Fallback: copy link
+    const ok = await copyToClipboard(window.location.href);
+    toast.success(ok ? "Link copied to clipboard" : "Could not copy link");
+  };
+
+  const handleCopy = async () => {
+    const ok = await copyToClipboard(getShareText());
+    if (ok) {
+      setCopied(true);
+      toast.success("Copied to clipboard");
+      setTimeout(() => setCopied(false), 2000);
+    } else {
+      toast.error("Could not copy text");
+    }
   };
 
   return (
