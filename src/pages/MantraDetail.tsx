@@ -1,15 +1,14 @@
 import { useParams, Link } from "react-router-dom";
-import { useMantraBySlug, useMantraVerses } from "@/hooks/use-mantras";
+import { useMantraBySlug } from "@/hooks/use-mantras";
 import { useSettings } from "@/hooks/use-settings";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Heart, Share2, Copy, Check, BookOpen, Sparkles, Clock, Hash } from "lucide-react";
+import { ArrowLeft, Heart, Share2, Copy, Check, Sparkles, Clock, Hash } from "lucide-react";
 import { DynamicIcon } from "@/components/DynamicIcon";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
 import { PageTransition } from "@/components/PageTransition";
 import { Skeleton } from "@/components/ui/skeleton";
-import { VerseDisplay } from "@/components/VerseDisplay";
 import { toast } from "sonner";
 
 const sectionVariants = {
@@ -24,7 +23,6 @@ const sectionVariants = {
 const MantraDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: mantra, isLoading } = useMantraBySlug(slug);
-  const { data: verses = [] } = useMantraVerses(mantra?.id);
   const { fontSize, setFontSize, addRecentlyViewed, favorites, toggleFavorite, language } = useSettings();
   const [copied, setCopied] = useState(false);
   const [viewMode, setViewMode] = useState<"telugu" | "english">("telugu");
@@ -67,7 +65,6 @@ const MantraDetail = () => {
   const benefitsEn = Array.isArray(mantra.benefits) ? mantra.benefits : [];
   const benefitsTe = Array.isArray((mantra as any).benefits_te) ? (mantra as any).benefits_te : [];
   const whenToChantTe = (mantra as any).when_to_chant_te as string | null;
-  const hasVerses = verses.length > 0;
 
   const handleShare = async () => {
     try {
@@ -147,11 +144,6 @@ const MantraDetail = () => {
                   <DynamicIcon name={mantra.category.icon} className="h-3 w-3" /> {mantra.category.name_en}
                 </span>
               )}
-              {hasVerses && (
-                <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                  <BookOpen className="h-3 w-3 mr-1" />{verses.length} verses
-                </span>
-              )}
               {mantra.tags?.slice(0, 3).map((t) => (
                 <span key={t} className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
                   #{t}
@@ -184,167 +176,79 @@ const MantraDetail = () => {
             ))}
           </motion.div>
 
-          {/* === VERSE-BASED CONTENT === */}
-          {hasVerses ? (
-            <div className="space-y-6">
-              {/* All verses */}
-              <motion.section custom={2} initial="hidden" animate="visible" variants={sectionVariants}
-                className="mantra-text-container"
-              >
-                <div className="space-y-0">
-                  {verses.map((verse, idx) => (
-                    <div key={verse.id}>
-                      {viewMode === "telugu" ? (
-                        <p className="font-telugu leading-[2.2] text-foreground whitespace-pre-line tracking-wide" style={{ fontSize: `${fontSize}px` }}>
-                          {verse.telugu}
-                        </p>
-                      ) : (
-                        <p className="leading-[2] text-foreground/85 whitespace-pre-line" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
-                          {verse.transliteration}
-                        </p>
+          {/* Main text */}
+          <div className="space-y-6">
+            <motion.section custom={2} initial="hidden" animate="visible" variants={sectionVariants}
+              className="mantra-text-container"
+            >
+              {viewMode === "telugu" ? (
+                <p className="font-telugu leading-[2.2] text-foreground whitespace-pre-line text-center tracking-wide" style={{ fontSize: `${fontSize}px` }}>
+                  {mantra.telugu_text}
+                </p>
+              ) : (
+                <p className="leading-[2] text-foreground/80 whitespace-pre-line text-center" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
+                  {mantra.transliteration}
+                </p>
+              )}
+            </motion.section>
+
+            {/* Meaning */}
+            <motion.section custom={3} initial="hidden" animate="visible" variants={sectionVariants}
+              className="meta-section"
+            >
+              <h3 className="meta-section-title">
+                {viewMode === "telugu" ? "అర్థం" : "Meaning"}
+              </h3>
+              <p className={cn("text-sm leading-[1.85] text-foreground/85", viewMode === "telugu" && "font-telugu")}>
+                {viewMode === "telugu" ? (mantra.meaning_te || mantra.meaning_en) : mantra.meaning_en}
+              </p>
+            </motion.section>
+
+            {/* Benefits & When to Chant */}
+            {(() => {
+              const benefits = viewMode === "telugu" && benefitsTe.length > 0 ? benefitsTe : benefitsEn;
+              const wtc = viewMode === "telugu" && whenToChantTe ? whenToChantTe : mantra.when_to_chant;
+              return (
+                <>
+                  {benefits.length > 0 && (
+                    <motion.section custom={4} initial="hidden" animate="visible" variants={sectionVariants}
+                      className="meta-section"
+                    >
+                      <h3 className="meta-section-title">
+                        {viewMode === "telugu" ? "ప్రయోజనాలు" : "Benefits"}
+                      </h3>
+                      <ul className="space-y-2.5">
+                        {benefits.map((b: string, i: number) => (
+                          <li key={i} className={cn("text-sm leading-[1.75] text-foreground/85 flex gap-2.5", viewMode === "telugu" && "font-telugu")}>
+                            <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5">
+                              {i + 1}
+                            </span>
+                            <span>{b}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.section>
+                  )}
+                  {wtc && (
+                    <motion.section custom={5} initial="hidden" animate="visible" variants={sectionVariants}
+                      className="meta-section"
+                    >
+                      <h3 className="meta-section-title">
+                        {viewMode === "telugu" ? "ఎప్పుడు చదవాలి" : "When to Chant"}
+                      </h3>
+                      <p className={cn("text-sm leading-[1.75] text-foreground/85", viewMode === "telugu" && "font-telugu")}>{wtc}</p>
+                      {mantra.chant_count && (
+                        <div className="mt-3 flex items-center gap-2 rounded-lg bg-primary/8 px-3 py-2">
+                          <span className="text-sm font-semibold text-primary">{mantra.chant_count}×</span>
+                          <span className="text-xs text-muted-foreground">{viewMode === "telugu" ? "సార్లు చదవాలి" : "recommended repetitions"}</span>
+                        </div>
                       )}
-                      {idx < verses.length - 1 && <div className="verse-separator" />}
-                    </div>
-                  ))}
-                </div>
-              </motion.section>
-
-              {/* Meaning */}
-              <motion.section custom={3} initial="hidden" animate="visible" variants={sectionVariants}
-                className="meta-section"
-              >
-                <h3 className="meta-section-title">
-                  {viewMode === "telugu" ? "అర్థం" : "Meaning"}
-                </h3>
-                <p className={cn(
-                  "text-sm leading-[1.85] text-foreground/85",
-                  viewMode === "telugu" && "font-telugu"
-                )}>
-                  {viewMode === "telugu" ? (mantra.meaning_te || mantra.meaning_en) : mantra.meaning_en}
-                </p>
-              </motion.section>
-
-              {/* Benefits & When to Chant */}
-              {(() => {
-                const benefits = viewMode === "telugu" && benefitsTe.length > 0 ? benefitsTe : benefitsEn;
-                const wtc = viewMode === "telugu" && whenToChantTe ? whenToChantTe : mantra.when_to_chant;
-                return (
-                  <>
-                    {benefits.length > 0 && (
-                      <motion.section custom={4} initial="hidden" animate="visible" variants={sectionVariants}
-                        className="meta-section"
-                      >
-                        <h3 className="meta-section-title">
-                          {viewMode === "telugu" ? "ప్రయోజనాలు" : "Benefits"}
-                        </h3>
-                        <ul className="space-y-2.5">
-                          {benefits.map((b: string, i: number) => (
-                            <li key={i} className={cn("text-sm leading-[1.75] text-foreground/85 flex gap-2.5", viewMode === "telugu" && "font-telugu")}>
-                              <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5">
-                                {i + 1}
-                              </span>
-                              <span>{b}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </motion.section>
-                    )}
-                    {wtc && (
-                      <motion.section custom={5} initial="hidden" animate="visible" variants={sectionVariants}
-                        className="meta-section"
-                      >
-                        <h3 className="meta-section-title">
-                          {viewMode === "telugu" ? "ఎప్పుడు చదవాలి" : "When to Chant"}
-                        </h3>
-                        <p className={cn("text-sm leading-[1.75] text-foreground/85", viewMode === "telugu" && "font-telugu")}>{wtc}</p>
-                        {mantra.chant_count && (
-                          <div className="mt-3 flex items-center gap-2 rounded-lg bg-primary/8 px-3 py-2">
-                            <span className="text-sm font-semibold text-primary">{mantra.chant_count}×</span>
-                            <span className="text-xs text-muted-foreground">{viewMode === "telugu" ? "సార్లు చదవాలి" : "recommended repetitions"}</span>
-                          </div>
-                        )}
-                      </motion.section>
-                    )}
-                  </>
-                );
-              })()}
-            </div>
-          ) : (
-            /* === SINGLE-TEXT CONTENT (short mantras) === */
-            <div className="space-y-6">
-              {/* Main text */}
-              <motion.section custom={2} initial="hidden" animate="visible" variants={sectionVariants}
-                className="mantra-text-container"
-              >
-                {viewMode === "telugu" ? (
-                  <p className="font-telugu leading-[2.2] text-foreground whitespace-pre-line text-center tracking-wide" style={{ fontSize: `${fontSize}px` }}>
-                    {mantra.telugu_text}
-                  </p>
-                ) : (
-                  <p className="leading-[2] text-foreground/80 whitespace-pre-line text-center" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
-                    {mantra.transliteration}
-                  </p>
-                )}
-              </motion.section>
-
-              {/* Meaning */}
-              <motion.section custom={3} initial="hidden" animate="visible" variants={sectionVariants}
-                className="meta-section"
-              >
-                <h3 className="meta-section-title">
-                  {viewMode === "telugu" ? "అర్థం" : "Meaning"}
-                </h3>
-                <p className={cn("text-sm leading-[1.85] text-foreground/85", viewMode === "telugu" && "font-telugu")}>
-                  {viewMode === "telugu" ? (mantra.meaning_te || mantra.meaning_en) : mantra.meaning_en}
-                </p>
-              </motion.section>
-
-              {/* Benefits & When to Chant */}
-              {(() => {
-                const benefits = viewMode === "telugu" && benefitsTe.length > 0 ? benefitsTe : benefitsEn;
-                const wtc = viewMode === "telugu" && whenToChantTe ? whenToChantTe : mantra.when_to_chant;
-                return (
-                  <>
-                    {benefits.length > 0 && (
-                      <motion.section custom={4} initial="hidden" animate="visible" variants={sectionVariants}
-                        className="meta-section"
-                      >
-                        <h3 className="meta-section-title">
-                          {viewMode === "telugu" ? "ప్రయోజనాలు" : "Benefits"}
-                        </h3>
-                        <ul className="space-y-2.5">
-                          {benefits.map((b: string, i: number) => (
-                            <li key={i} className={cn("text-sm leading-[1.75] text-foreground/85 flex gap-2.5", viewMode === "telugu" && "font-telugu")}>
-                              <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary mt-0.5">
-                                {i + 1}
-                              </span>
-                              <span>{b}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </motion.section>
-                    )}
-                    {wtc && (
-                      <motion.section custom={5} initial="hidden" animate="visible" variants={sectionVariants}
-                        className="meta-section"
-                      >
-                        <h3 className="meta-section-title">
-                          {viewMode === "telugu" ? "ఎప్పుడు చదవాలి" : "When to Chant"}
-                        </h3>
-                        <p className={cn("text-sm leading-[1.75] text-foreground/85", viewMode === "telugu" && "font-telugu")}>{wtc}</p>
-                        {mantra.chant_count && (
-                          <div className="mt-3 flex items-center gap-2 rounded-lg bg-primary/8 px-3 py-2">
-                            <span className="text-sm font-semibold text-primary">{mantra.chant_count}×</span>
-                            <span className="text-xs text-muted-foreground">{viewMode === "telugu" ? "సార్లు చదవాలి" : "recommended repetitions"}</span>
-                          </div>
-                        )}
-                      </motion.section>
-                    )}
-                  </>
-                );
-              })()}
-            </div>
-          )}
+                    </motion.section>
+                  )}
+                </>
+              );
+            })()}
+          </div>
         </main>
       </div>
     </PageTransition>
