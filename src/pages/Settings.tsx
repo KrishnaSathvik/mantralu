@@ -241,7 +241,7 @@ const Settings = () => {
 
           {/* About */}
           <motion.div custom={7} initial="hidden" animate="visible" variants={cardVariants} className="rounded-xl border bg-card p-4 sm:p-5">
-            <h3 className="font-semibold text-foreground mb-1">About మంత్రాలు</h3>
+            <h3 className="font-semibold text-foreground mb-1">About Mantras</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Sacred Telugu mantras for daily devotion. Browse Hindu mantras, prayers, and stotras in Telugu and English.
               Built with love for spiritual seekers.
