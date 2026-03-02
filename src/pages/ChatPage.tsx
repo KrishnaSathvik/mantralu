@@ -56,8 +56,18 @@ const ChatPage = () => {
     });
   }, []);
 
-  // Scroll on new messages and during streaming
+  const hasScrolledOnMount = useRef(false);
+
+  // Scroll on new messages and during streaming (skip initial mount)
   useEffect(() => {
+    if (!hasScrolledOnMount.current) {
+      hasScrolledOnMount.current = true;
+      // Scroll to top on mount (when returning to chat page)
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTo({ top: 0, behavior: "instant" });
+      }
+      return;
+    }
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
@@ -65,12 +75,6 @@ const ChatPage = () => {
     saveHistory(messages);
   }, [messages]);
 
-  // Scroll to top on mount (when returning to chat page)
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ top: 0, behavior: "instant" });
-    }
-  }, []);
 
   const handleClear = () => {
     setMessages([]);
