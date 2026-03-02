@@ -1,19 +1,14 @@
 import { DailyMantra } from "@/components/DailyMantra";
-
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { MantraCard } from "@/components/MantraCard";
 import { PageTransition, StaggerContainer, StaggerItem } from "@/components/PageTransition";
 import { useMantras } from "@/hooks/use-mantras";
-import { useSettings } from "@/hooks/use-settings";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
-  const { recentlyViewed } = useSettings();
   const { data: mantras, isLoading } = useMantras();
 
-  const recentMantras = recentlyViewed
-    .map((id) => mantras?.find((m) => m.id === id))
-    .filter(Boolean) as NonNullable<typeof mantras>;
+  const topMantras = mantras?.slice(0, 10);
 
   return (
     <PageTransition>
@@ -28,7 +23,6 @@ const Index = () => {
         </header>
 
         <main className="mx-auto max-w-lg px-4 py-5 space-y-6 safe-area-x">
-          
           <DailyMantra />
 
           <section>
@@ -36,9 +30,8 @@ const Index = () => {
             <CategoryGrid />
           </section>
 
-
           <section>
-            <h2 className="font-display text-lg font-semibold text-foreground mb-3">All Mantras</h2>
+            <h2 className="font-display text-lg font-semibold text-foreground mb-3">Top Mantras</h2>
             {isLoading ? (
               <div className="space-y-2.5">
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -47,7 +40,7 @@ const Index = () => {
               </div>
             ) : (
               <StaggerContainer className="space-y-2.5">
-                {mantras?.map((m) => (
+                {topMantras?.map((m) => (
                   <StaggerItem key={m.id}>
                     <MantraCard mantra={m} />
                   </StaggerItem>
