@@ -296,6 +296,16 @@ export default function Admin() {
                         {mantra.title_en}
                       </button>
                       <p className="text-xs text-muted-foreground font-telugu truncate">{mantra.title_te}</p>
+                      {mantra.telugu_text && (
+                        <p className="text-xs text-muted-foreground/70 font-telugu truncate mt-0.5" title={mantra.telugu_text}>
+                          తెలుగు: {mantra.telugu_text.slice(0, 80)}{mantra.telugu_text.length > 80 ? "…" : ""}
+                        </p>
+                      )}
+                      {mantra.transliteration && (
+                        <p className="text-xs text-muted-foreground/60 italic truncate mt-0.5" title={mantra.transliteration}>
+                          EN: {mantra.transliteration.slice(0, 80)}{mantra.transliteration.length > 80 ? "…" : ""}
+                        </p>
+                      )}
                       <div className="flex gap-1.5 mt-1 flex-wrap">
                         {mantra.deity && <Badge variant="secondary" className="text-xs">{mantra.deity.name_en}</Badge>}
                         {mantra.category && <Badge variant="outline" className="text-xs">{mantra.category.name_en}</Badge>}
