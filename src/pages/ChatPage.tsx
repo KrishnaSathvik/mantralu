@@ -39,9 +39,12 @@ const ChatPage = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingContent, setStreamingContent] = useState("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const pendingContentRef = useRef("");
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     requestAnimationFrame(() => {
@@ -145,17 +148,20 @@ const ChatPage = () => {
       const decoder = new TextDecoder();
       let buffer = "";
 
+      const flushContent = () => {
+        setStreamingContent(pendingContentRef.current);
+        scrollToBottom();
+        rafRef.current = null;
+      };
+
       const upsert = (chunk: string) => {
         assistantSoFar += chunk;
+        pendingContentRef.current = assistantSoFar;
         if (!isStreaming) setIsStreaming(true);
-        const content = assistantSoFar;
-        setMessages((prev) => {
-          const last = prev[prev.length - 1];
-          if (last?.role === "assistant" && last.timestamp === 0) {
-            return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content } : m));
-          }
-          return [...prev, { role: "assistant", content, timestamp: 0 }];
-        });
+        // Throttle UI updates to animation frames for smooth streaming
+        if (!rafRef.current) {
+          rafRef.current = requestAnimationFrame(flushContent);
+        }
       };
 
       while (true) {
@@ -182,9 +188,17 @@ const ChatPage = () => {
         }
       }
 
-      setMessages((prev) =>
-        prev.map((m, i) => (i === prev.length - 1 && m.timestamp === 0 ? { ...m, timestamp: Date.now() } : m))
-      );
+      // Final flush — commit streaming content to session storage
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      setStreamingContent("");
+      pendingContentRef.current = "";
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant" && last.timestamp === 0) {
+          return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar, timestamp: Date.now() } : m));
+        }
+        return [...prev, { role: "assistant", content: assistantSoFar, timestamp: Date.now() }];
+      });
     } catch (e: any) {
       console.error("Chat error:", e);
       toast.error(e.message || "Failed to get response");
@@ -261,52 +275,68 @@ const ChatPage = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {messages.map((msg, i) => {
-                  const isStreamingMsg = msg.role === "assistant" && msg.timestamp === 0;
-                  return (
-                    <motion.div
-                      key={`${i}-${msg.timestamp}`}
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}
-                    >
-                      {msg.role === "assistant" && (
-                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0 mt-1 mr-2">
-                          🕉️
-                        </div>
-                      )}
-                      <div
-                        className={cn(
-                          "rounded-2xl text-[13.5px] leading-[1.7]",
-                          msg.role === "user"
-                            ? "bg-primary text-primary-foreground px-4 py-2.5 rounded-br-md max-w-[80%]"
-                            : "bg-card border px-4 py-3 rounded-bl-md max-w-[88%]"
-                        )}
-                      >
-                        {msg.role === "assistant" ? (
-                          <div className={cn("chat-markdown", isStreamingMsg && "streaming")}>
-                            <ReactMarkdown>{msg.content}</ReactMarkdown>
-                          </div>
-                        ) : (
-                          <p className="whitespace-pre-wrap">{msg.content}</p>
-                        )}
-                        {msg.timestamp > 0 && (
-                          <p
-                            className={cn(
-                              "text-[10px] mt-1.5 select-none",
-                              msg.role === "user"
-                                ? "text-primary-foreground/50 text-right"
-                                : "text-muted-foreground/60"
-                            )}
-                          >
-                            {formatTime(msg.timestamp)}
-                          </p>
-                        )}
+                {messages.map((msg, i) => (
+                  <motion.div
+                    key={`${i}-${msg.timestamp}`}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}
+                  >
+                    {msg.role === "assistant" && (
+                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0 mt-1 mr-2">
+                        🕉️
                       </div>
-                    </motion.div>
-                  );
-                })}
+                    )}
+                    <div
+                      className={cn(
+                        "rounded-2xl text-[13.5px] leading-[1.7]",
+                        msg.role === "user"
+                          ? "bg-primary text-primary-foreground px-4 py-2.5 rounded-br-md max-w-[80%]"
+                          : "bg-card border px-4 py-3 rounded-bl-md max-w-[88%]"
+                      )}
+                    >
+                      {msg.role === "assistant" ? (
+                        <div className="chat-markdown">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      )}
+                      {msg.timestamp > 0 && (
+                        <p
+                          className={cn(
+                            "text-[10px] mt-1.5 select-none",
+                            msg.role === "user"
+                              ? "text-primary-foreground/50 text-right"
+                              : "text-muted-foreground/60"
+                          )}
+                        >
+                          {formatTime(msg.timestamp)}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+
+                {/* Live streaming bubble */}
+                {isStreaming && streamingContent && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex justify-start"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm shrink-0 mt-1 mr-2">
+                      🕉️
+                    </div>
+                    <div className="bg-card border px-4 py-3 rounded-2xl rounded-bl-md max-w-[88%] text-[13.5px] leading-[1.7]">
+                      <div className="chat-markdown streaming">
+                        <ReactMarkdown>{streamingContent}</ReactMarkdown>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Typing indicator */}
                 {isLoading && !isStreaming && (
