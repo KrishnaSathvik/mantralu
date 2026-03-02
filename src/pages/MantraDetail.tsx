@@ -4,6 +4,7 @@ import { useSettings } from "@/hooks/use-settings";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Heart, Share2, Copy, Check } from "lucide-react";
 import { DynamicIcon } from "@/components/DynamicIcon";
+import { ShareSheet } from "@/components/ShareSheet";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { PageTransition } from "@/components/PageTransition";
@@ -40,6 +41,7 @@ const MantraDetail = () => {
   const { fontSize, setFontSize, addRecentlyViewed, favorites, toggleFavorite } = useSettings();
   const [copied, setCopied] = useState(false);
   const [viewMode, setViewMode] = useState<"telugu" | "english">("telugu");
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -79,6 +81,7 @@ const MantraDetail = () => {
   const benefitsEn = Array.isArray(mantra.benefits) ? mantra.benefits : [];
   const benefitsTe = Array.isArray((mantra as any).benefits_te) ? (mantra as any).benefits_te : [];
   const whenToChantTe = (mantra as any).when_to_chant_te as string | null;
+  const deityImage = deityImageMap[mantra.deity?.name_en || "Universal"] || deityImageMap.Universal;
 
   const getShareText = () => {
     return `${mantra.title_en}\n${mantra.title_te}\n\n${mantra.telugu_text}\n\n${mantra.transliteration}\n\n${mantra.meaning_en}`;
@@ -107,23 +110,8 @@ const MantraDetail = () => {
     }
   };
 
-  const handleShare = async () => {
-    const shareData = {
-      title: mantra.title_en,
-      text: `${mantra.title_en} — ${mantra.transliteration}`,
-      url: window.location.href,
-    };
-    if (typeof navigator.share === "function") {
-      try {
-        await navigator.share(shareData);
-        return;
-      } catch (e: any) {
-        if (e?.name === "AbortError") return; // user cancelled
-      }
-    }
-    // Fallback: copy link
-    const ok = await copyToClipboard(window.location.href);
-    toast.success(ok ? "Link copied to clipboard" : "Could not copy link");
+  const handleShare = () => {
+    setShareOpen(true);
   };
 
   const handleCopy = async () => {
@@ -169,7 +157,7 @@ const MantraDetail = () => {
             className="flex justify-center"
           >
             <img
-              src={deityImageMap[mantra.deity?.name_en || "Universal"] || deityImageMap.Universal}
+              src={deityImage}
               alt={mantra.deity?.name_en || "Devotional"}
               className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover border-4 border-primary/20 shadow-lg"
               loading="eager"
@@ -299,6 +287,15 @@ const MantraDetail = () => {
             })()}
           </div>
         </main>
+
+        <ShareSheet
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          title={mantra.title_en}
+          text={mantra.transliteration}
+          url={window.location.href}
+          imageUrl={deityImage}
+        />
       </div>
     </PageTransition>
   );
