@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Loader2, Save, ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { useDeities, useCategories, DbMantra } from "@/hooks/use-mantras";
-import { VersesEditor } from "./VersesEditor";
+
 import { useQueryClient } from "@tanstack/react-query";
 
 interface MantraEditorProps {
@@ -281,13 +281,6 @@ export function MantraEditor({ mantra, onBack, onSaved }: MantraEditorProps) {
         </div>
       </Card>
 
-      {/* Verses Editor (only for existing mantras) */}
-      {!isNew && mantra && (
-        <>
-          <Separator />
-          <VersesEditor mantraId={mantra.id} />
-        </>
-      )}
 
       {/* Bottom save */}
       <div className="flex justify-end pt-2 pb-8">
