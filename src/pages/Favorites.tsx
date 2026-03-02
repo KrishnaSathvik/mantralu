@@ -12,19 +12,19 @@ const Favorites = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen pb-24">
-        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md px-4 py-3 safe-area-top safe-area-x">
-          <div className="mx-auto max-w-lg flex items-center gap-3">
-            <Link to="/" className="text-muted-foreground hover:text-foreground">
+      <div className="min-h-screen pb-20">
+        <header className="page-header">
+          <div className="page-header-inner">
+            <Link to="/" className="page-back-btn">
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <h1 className="font-display text-xl font-bold text-foreground">Favorites</h1>
+            <h1 className="page-title">Favorites</h1>
           </div>
         </header>
 
-        <main className="mx-auto max-w-lg px-4 py-5 safe-area-x">
+        <main className="page-main">
           {favMantras.length > 0 ? (
-            <StaggerContainer className="space-y-2.5">
+            <StaggerContainer className="space-y-3">
               {favMantras.map((m) => (
                 <StaggerItem key={m.id}>
                   <MantraCard mantra={m} />
@@ -32,10 +32,14 @@ const Favorites = () => {
               ))}
             </StaggerContainer>
           ) : (
-            <div className="text-center py-16">
-              <Heart className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-              <p className="text-muted-foreground">No favorites yet</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">Tap the heart icon on any mantra to save it here</p>
+            <div className="text-center py-20 px-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+                <Heart className="h-7 w-7 text-muted-foreground" />
+              </div>
+              <p className="font-display text-lg font-semibold text-foreground mb-1">No favorites yet</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Tap the heart icon on any mantra to save it here for quick access
+              </p>
             </div>
           )}
         </main>

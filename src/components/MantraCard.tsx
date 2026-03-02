@@ -17,32 +17,31 @@ export function MantraCard({ mantra, compact }: MantraCardProps) {
 
   return (
     <motion.div
-      whileHover={{ scale: 1.01, y: -2 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
       <Link
         to={`/mantra/${mantra.slug}`}
-        className="group block rounded-lg border bg-card p-4 transition-shadow hover:shadow-md hover:border-primary/30"
+        className="group block rounded-xl border bg-card p-4 transition-all active:bg-card/80 hover:shadow-md hover:border-primary/30"
       >
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h3 className="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+            <h3 className="font-display text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
               {mantra.title_en}
             </h3>
             {!compact && (
-              <p className="font-telugu text-base text-muted-foreground mt-0.5 truncate">
+              <p className="font-telugu text-sm sm:text-base text-muted-foreground mt-0.5 line-clamp-1">
                 {mantra.title_te}
               </p>
             )}
-            <div className="mt-2 flex flex-wrap gap-1.5">
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
               {mantra.deity && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
                   <DynamicIcon name={mantra.deity.icon} className="h-3 w-3" /> {mantra.deity.name_en}
                 </span>
               )}
               {mantra.category && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
                   <DynamicIcon name={mantra.category.icon} className="h-3 w-3" /> {mantra.category.name_en}
                 </span>
               )}
@@ -55,7 +54,7 @@ export function MantraCard({ mantra, compact }: MantraCardProps) {
               e.stopPropagation();
               toggleFavorite(mantra.id);
             }}
-            className="mt-1 shrink-0 rounded-full p-1.5 transition-colors hover:bg-primary/10"
+            className="mt-0.5 shrink-0 rounded-full p-2 transition-colors hover:bg-primary/10 active:bg-primary/20"
             aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
           >
             <Heart
