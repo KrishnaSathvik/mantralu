@@ -9,7 +9,7 @@
     --background: 40 100% 98%;
     --foreground: 0 30% 15%;
 
-    --card: 36 60% 96%;
+    --card: 38 55% 97%;
     --card-foreground: 0 30% 15%;
 
     --popover: 40 100% 98%;
@@ -30,8 +30,8 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 30 25% 85%;
-    --input: 30 25% 85%;
+    --border: 28 30% 78%;
+    --input: 28 30% 78%;
     --ring: 27 85% 50%;
 
     --radius: 0.75rem;
@@ -42,7 +42,7 @@
     --sidebar-primary-foreground: 40 100% 98%;
     --sidebar-accent: 36 30% 90%;
     --sidebar-accent-foreground: 0 30% 15%;
-    --sidebar-border: 30 25% 85%;
+    --sidebar-border: 28 30% 78%;
     --sidebar-ring: 27 85% 50%;
 
     --safe-area-top: env(safe-area-inset-top, 0px);
