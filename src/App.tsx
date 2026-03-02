@@ -7,7 +7,7 @@ import { AnimatePresence } from "framer-motion";
 import { SettingsProvider } from "@/hooks/use-settings";
 import { BottomNav } from "@/components/BottomNav";
 import Index from "./pages/Index";
-
+import Browse from "./pages/Browse";
 import MantraDetail from "./pages/MantraDetail";
 import SearchPage from "./pages/SearchPage";
 import Favorites from "./pages/Favorites";
@@ -24,6 +24,7 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Index />} />
         
+        <Route path="/browse" element={<Browse />} />
         <Route path="/mantra/:slug" element={<MantraDetail />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/favorites" element={<Favorites />} />
