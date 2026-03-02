@@ -1,11 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, Heart, Settings } from "lucide-react";
+import { Home, Search, MessageCircle, Heart, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/search", icon: Search, label: "Search" },
+  { to: "/chat", icon: MessageCircle, label: "Chat" },
   { to: "/favorites", icon: Heart, label: "Favorites" },
   { to: "/settings", icon: Settings, label: "Settings" },
 ];
