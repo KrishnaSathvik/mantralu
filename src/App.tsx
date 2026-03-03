@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { SettingsProvider } from "@/hooks/use-settings";
 import { BottomNav } from "@/components/BottomNav";
-import { OnboardingDialog } from "@/components/OnboardingDialog";
+
 import { useAnalytics } from "@/hooks/use-analytics";
 import Index from "./pages/Index";
 import Browse from "./pages/Browse";
@@ -50,7 +50,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <OnboardingDialog />
+          
           <AnimatedRoutes />
           <BottomNav />
         </BrowserRouter>
