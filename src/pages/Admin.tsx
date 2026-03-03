@@ -11,6 +11,7 @@ import { Link, Navigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { PageTransition } from "@/components/PageTransition";
 import { MantraEditor } from "@/components/admin/MantraEditor";
+import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { DbMantra } from "@/hooks/use-mantras";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 
@@ -237,6 +238,9 @@ export default function Admin() {
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Analytics */}
+        <AnalyticsDashboard />
 
         {/* Pipeline Controls */}
         <Card className="p-4 mb-6 space-y-4">
