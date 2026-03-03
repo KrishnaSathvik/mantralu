@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { PageTransition } from "@/components/PageTransition";
+import { NamePrompt } from "@/components/NamePrompt";
 import { toast } from "sonner";
 import { getUserName } from "@/lib/device";
 import {
@@ -107,9 +108,18 @@ const ChatPage = () => {
     hasScrolledOnMount.current = false;
   };
 
+  const [needsName, setNeedsName] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState("");
+
   const send = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
+
+    if (!getUserName()) {
+      setPendingMessage(trimmed);
+      setNeedsName(true);
+      return;
+    }
 
     // Auto-create session if none active
     let currentId = activeId;
@@ -295,7 +305,26 @@ const ChatPage = () => {
         {/* Messages area */}
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto scrollbar-none">
           <div className="mx-auto max-w-lg px-5 sm:px-6 pt-4 pb-4 safe-area-x">
-            {showStarters ? (
+            {needsName ? (
+              <div className="pt-8 space-y-4">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl mb-4 mx-auto">
+                    🙏
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">Tell us your name to start chatting</p>
+                </div>
+                <NamePrompt
+                  message="What should we call you?"
+                  onComplete={() => {
+                    setNeedsName(false);
+                    if (pendingMessage) {
+                      send(pendingMessage);
+                      setPendingMessage("");
+                    }
+                  }}
+                />
+              </div>
+            ) : showStarters ? (
               <div className="flex flex-col items-center pt-8">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl mb-4">
                   🙏

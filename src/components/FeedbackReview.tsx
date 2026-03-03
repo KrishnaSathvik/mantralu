@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Star, Send, MessageSquareHeart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getDeviceId, getUserName } from "@/lib/device";
+import { NamePrompt } from "@/components/NamePrompt";
 import { toast } from "sonner";
 
 const cardVariants = {
@@ -71,11 +72,13 @@ export function ReviewSection({ customIndex = 5 }: { customIndex?: number }) {
   const [comment, setComment] = useState("");
   const [sending, setSending] = useState(false);
 
+  const [needsName, setNeedsName] = useState(false);
+
   const handleSubmitReview = async () => {
     if (rating === 0 || sending) return;
     const userName = getUserName();
     if (!userName) {
-      toast.error("Please set your name first");
+      setNeedsName(true);
       return;
     }
     setSending(true);
@@ -139,6 +142,17 @@ export function ReviewSection({ customIndex = 5 }: { customIndex?: number }) {
         maxLength={500}
         className="w-full resize-none rounded-xl border bg-background px-3.5 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all mb-2"
       />
+      {needsName && (
+        <div className="mb-2">
+          <NamePrompt
+            message="Enter your name to submit a review"
+            onComplete={() => {
+              setNeedsName(false);
+              handleSubmitReview();
+            }}
+          />
+        </div>
+      )}
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={handleSubmitReview}
