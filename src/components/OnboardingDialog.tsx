@@ -4,19 +4,23 @@ import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getDeviceId, getUserName, setUserName, hasCompletedOnboarding } from "@/lib/device";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 export function OnboardingDialog() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
+
+  const isAdminRoute = location.pathname.startsWith("/admin");
 
   useEffect(() => {
-    if (!hasCompletedOnboarding()) {
-      // Small delay for app to render first
+    if (!hasCompletedOnboarding() && !isAdminRoute) {
       const t = setTimeout(() => setOpen(true), 800);
       return () => clearTimeout(t);
     }
-  }, []);
+    if (isAdminRoute) setOpen(false);
+  }, [isAdminRoute]);
 
   const handleSubmit = async () => {
     const trimmed = name.trim();
