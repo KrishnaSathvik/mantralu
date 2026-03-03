@@ -25,5 +25,5 @@ export function setUserName(name: string) {
 }
 
 export function hasCompletedOnboarding(): boolean {
-  return !!localStorage.getItem(USER_NAME_KEY);
+  return !!localStorage.getItem(USER_NAME_KEY) || !!localStorage.getItem("mv-onboarding-skipped");
 }
