@@ -2,45 +2,46 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
+async function checkAdminRole(userId: string): Promise<boolean> {
+  const { data } = await supabase.rpc("has_role", {
+    _user_id: userId,
+    _role: "admin" as const,
+  });
+  return !!data;
+}
+
 export function useAdminAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        if (currentUser) {
-          const { data } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", currentUser.id)
-            .eq("role", "admin")
-            .maybeSingle();
-          setIsAdmin(!!data);
-        } else {
-          setIsAdmin(false);
-        }
-        setLoading(false);
-      }
-    );
-
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       if (currentUser) {
-        const { data } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", currentUser.id)
-          .eq("role", "admin")
-          .maybeSingle();
-        setIsAdmin(!!data);
+        checkAdminRole(currentUser.id).then(setIsAdmin).finally(() => setLoading(false));
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        if (currentUser) {
+          // Defer async work to avoid Supabase auth lock deadlock
+          setTimeout(() => {
+            checkAdminRole(currentUser.id).then(setIsAdmin).finally(() => setLoading(false));
+          }, 0);
+        } else {
+          setIsAdmin(false);
+          setLoading(false);
+        }
+      }
+    );
 
     return () => subscription.unsubscribe();
   }, []);
