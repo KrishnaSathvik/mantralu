@@ -23,27 +23,33 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await signIn(ADMIN_EMAIL, password);
+      const { error, data } = await supabase.auth.signInWithPassword({
+        email: ADMIN_EMAIL,
+        password,
+      });
       if (error) {
         toast.error("Invalid password.");
         return;
       }
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .eq("role", "admin")
-          .maybeSingle();
-        if (roleData) {
-          toast.success("Welcome, Admin!");
-          navigate("/admin");
-        } else {
-          toast.error("You don't have admin access.");
-          await supabase.auth.signOut();
-        }
+      const userId = data.user?.id;
+      if (!userId) {
+        toast.error("Login failed.");
+        return;
       }
+      // Use has_role RPC (SECURITY DEFINER, bypasses RLS)
+      const { data: isAdmin, error: rpcError } = await supabase.rpc("has_role", {
+        _user_id: userId,
+        _role: "admin",
+      });
+      if (rpcError || !isAdmin) {
+        toast.error("You don't have admin access.");
+        await supabase.auth.signOut();
+        return;
+      }
+      toast.success("Welcome, Admin!");
+      navigate("/admin");
+    } catch (err) {
+      toast.error("Something went wrong.");
     } finally {
       setLoading(false);
     }
