@@ -331,6 +331,51 @@ export type Database = {
         }
         Relationships: []
       }
+      rashi_phalalu: {
+        Row: {
+          created_at: string
+          id: string
+          prediction_en: string | null
+          prediction_te: string
+          rashi_icon: string
+          rashi_name_en: string
+          rashi_name_te: string
+          remedies_te: string | null
+          samvatsaram: string
+          sort_order: number
+          year_end: string
+          year_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prediction_en?: string | null
+          prediction_te: string
+          rashi_icon?: string
+          rashi_name_en: string
+          rashi_name_te: string
+          remedies_te?: string | null
+          samvatsaram: string
+          sort_order?: number
+          year_end: string
+          year_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prediction_en?: string | null
+          prediction_te?: string
+          rashi_icon?: string
+          rashi_name_en?: string
+          rashi_name_te?: string
+          remedies_te?: string | null
+          samvatsaram?: string
+          sort_order?: number
+          year_end?: string
+          year_start?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           comment: string | null
