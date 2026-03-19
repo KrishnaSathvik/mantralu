@@ -234,8 +234,13 @@ const Settings = () => {
             )}
           </motion.div>
 
+          {/* Rashi Phalalu - always accessible here */}
+          <motion.div custom={5} initial="hidden" animate="visible" variants={cardVariants} className="rounded-xl border bg-card p-4 sm:p-5">
+            <RashiPhalaluSection forceShow />
+          </motion.div>
+
           {/* Feedback */}
-          <FeedbackSection customIndex={5} />
+          <FeedbackSection customIndex={6} />
 
           {/* Review */}
           <ReviewSection customIndex={6} />
