@@ -1,4 +1,5 @@
 import { UgadiBanner } from "@/components/UgadiBanner";
+import { RashiPhalaluSection } from "@/components/RashiPhalaluSection";
 import { DailyMantra } from "@/components/DailyMantra";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { MantraCard } from "@/components/MantraCard";
@@ -31,6 +32,9 @@ const Index = () => {
 
           {/* Daily Mantra */}
           <DailyMantra />
+
+          {/* Rashi Phalalu - shows for 1 week after Ugadi */}
+          <RashiPhalaluSection />
 
           {/* Categories */}
           <section>
