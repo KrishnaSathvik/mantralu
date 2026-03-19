@@ -60,7 +60,7 @@ export function JapaCounter({ open, onClose, mantraTitle, recommendedCount }: Ja
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-between safe-area-inset"
+        className="fixed inset-0 z-[60] bg-background flex flex-col items-center justify-between safe-area-inset"
       >
         {/* Top bar */}
         <div className="w-full flex items-center justify-between px-4 py-3">
