@@ -107,6 +107,27 @@ export function RashiPhalaluSection({ forceShow = false }: { forceShow?: boolean
                     className="overflow-hidden"
                   >
                     <div className="px-4 pb-4 pt-2 space-y-3">
+                      {/* Aadhayam Vyayam numbers */}
+                      {r.aadayam != null && (
+                        <div className="grid grid-cols-4 gap-2 text-center">
+                          <div className="rounded-lg bg-secondary p-2">
+                            <p className="text-lg font-bold text-foreground">{r.aadayam}</p>
+                            <p className="text-[9px] text-muted-foreground">💰 ఆదాయం</p>
+                          </div>
+                          <div className="rounded-lg bg-secondary p-2">
+                            <p className="text-lg font-bold text-foreground">{r.vyayam}</p>
+                            <p className="text-[9px] text-muted-foreground">💸 వ్యయం</p>
+                          </div>
+                          <div className="rounded-lg bg-secondary p-2">
+                            <p className="text-lg font-bold text-foreground">{r.rajapujyam}</p>
+                            <p className="text-[9px] text-muted-foreground">👑 రాజపూజ్యం</p>
+                          </div>
+                          <div className="rounded-lg bg-secondary p-2">
+                            <p className="text-lg font-bold text-foreground">{r.avamanam}</p>
+                            <p className="text-[9px] text-muted-foreground">🚫 అవమానం</p>
+                          </div>
+                        </div>
+                      )}
                       <div>
                         <p className="font-telugu text-[13px] text-foreground leading-relaxed">
                           {r.prediction_te}

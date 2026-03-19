@@ -30,11 +30,11 @@ const Index = () => {
           {/* Ugadi Banner */}
           <UgadiBanner />
 
-          {/* Daily Mantra */}
-          <DailyMantra />
-
-          {/* Rashi Phalalu - shows for 1 week after Ugadi */}
+          {/* Rashi Phalalu - shows for 1 week after Ugadi (promoted above daily mantra on Ugadi) */}
           <RashiPhalaluSection />
+
+          {/* Daily Mantra - hidden on Ugadi day itself */}
+          {new Date().toDateString() !== new Date("2026-03-19").toDateString() && <DailyMantra />}
 
           {/* Categories */}
           <section>
