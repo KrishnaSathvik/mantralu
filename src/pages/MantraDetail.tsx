@@ -140,6 +140,9 @@ const MantraDetail = () => {
               <h1 className="font-display text-lg sm:text-xl text-foreground truncate">{mantra.title_en}</h1>
             </div>
             <div className="flex items-center gap-0 shrink-0">
+              <motion.button whileTap={{ scale: 0.85 }} onClick={() => setJapaOpen(true)} className="rounded-full p-2.5 hover:bg-secondary active:bg-secondary transition-colors" title="Japa Counter">
+                <Repeat className="h-[18px] w-[18px] text-muted-foreground" />
+              </motion.button>
               <motion.button whileTap={{ scale: 0.85 }} onClick={handleShare} className="rounded-full p-2.5 hover:bg-secondary active:bg-secondary transition-colors">
                 <Share2 className="h-[18px] w-[18px] text-muted-foreground" />
               </motion.button>
