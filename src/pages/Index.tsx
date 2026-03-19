@@ -1,3 +1,4 @@
+import { UgadiBanner } from "@/components/UgadiBanner";
 import { DailyMantra } from "@/components/DailyMantra";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { MantraCard } from "@/components/MantraCard";
@@ -25,6 +26,9 @@ const Index = () => {
         </header>
 
         <main className="page-main space-y-8 pb-4">
+          {/* Ugadi Banner */}
+          <UgadiBanner />
+
           {/* Daily Mantra */}
           <DailyMantra />
 
