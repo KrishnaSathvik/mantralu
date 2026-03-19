@@ -1,3 +1,4 @@
+import { UgadiBanner } from "@/components/UgadiBanner";
 import { DailyMantra } from "@/components/DailyMantra";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { MantraCard } from "@/components/MantraCard";
