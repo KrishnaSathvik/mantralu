@@ -13,6 +13,10 @@ interface RashiPhalalu {
   prediction_en: string | null;
   remedies_te: string | null;
   sort_order: number;
+  aadayam: number | null;
+  vyayam: number | null;
+  rajapujyam: number | null;
+  avamanam: number | null;
 }
 
 function useRashiPhalalu() {
@@ -71,7 +75,7 @@ export function RashiPhalaluSection({ forceShow = false }: { forceShow?: boolean
                     : "bg-card p-3 hover:bg-secondary/50 hover:border-primary/20"
                 }`}
               >
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                   <span className="text-2xl">{r.rashi_icon}</span>
                   <div className="min-w-0 flex-1">
                     <p className="font-display text-sm text-foreground leading-tight truncate">
@@ -85,6 +89,12 @@ export function RashiPhalaluSection({ forceShow = false }: { forceShow?: boolean
                     <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
                   ) : null}
                 </div>
+                {!isExpanded && r.aadayam != null && (
+                  <div className="flex gap-2 mt-1.5 text-[9px] text-muted-foreground">
+                    <span>💰{r.aadayam}</span>
+                    <span>💸{r.vyayam}</span>
+                  </div>
+                )}
               </motion.button>
 
               <AnimatePresence>
@@ -97,6 +107,27 @@ export function RashiPhalaluSection({ forceShow = false }: { forceShow?: boolean
                     className="overflow-hidden"
                   >
                     <div className="px-4 pb-4 pt-2 space-y-3">
+                      {/* Aadhayam Vyayam numbers */}
+                      {r.aadayam != null && (
+                        <div className="grid grid-cols-4 gap-2 text-center">
+                          <div className="rounded-lg bg-secondary p-2">
+                            <p className="text-lg font-bold text-foreground">{r.aadayam}</p>
+                            <p className="text-[9px] text-muted-foreground">💰 ఆదాయం</p>
+                          </div>
+                          <div className="rounded-lg bg-secondary p-2">
+                            <p className="text-lg font-bold text-foreground">{r.vyayam}</p>
+                            <p className="text-[9px] text-muted-foreground">💸 వ్యయం</p>
+                          </div>
+                          <div className="rounded-lg bg-secondary p-2">
+                            <p className="text-lg font-bold text-foreground">{r.rajapujyam}</p>
+                            <p className="text-[9px] text-muted-foreground">👑 రాజపూజ్యం</p>
+                          </div>
+                          <div className="rounded-lg bg-secondary p-2">
+                            <p className="text-lg font-bold text-foreground">{r.avamanam}</p>
+                            <p className="text-[9px] text-muted-foreground">🚫 అవమానం</p>
+                          </div>
+                        </div>
+                      )}
                       <div>
                         <p className="font-telugu text-[13px] text-foreground leading-relaxed">
                           {r.prediction_te}

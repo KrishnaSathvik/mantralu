@@ -333,44 +333,56 @@ export type Database = {
       }
       rashi_phalalu: {
         Row: {
+          aadayam: number | null
+          avamanam: number | null
           created_at: string
           id: string
           prediction_en: string | null
           prediction_te: string
+          rajapujyam: number | null
           rashi_icon: string
           rashi_name_en: string
           rashi_name_te: string
           remedies_te: string | null
           samvatsaram: string
           sort_order: number
+          vyayam: number | null
           year_end: string
           year_start: string
         }
         Insert: {
+          aadayam?: number | null
+          avamanam?: number | null
           created_at?: string
           id?: string
           prediction_en?: string | null
           prediction_te: string
+          rajapujyam?: number | null
           rashi_icon?: string
           rashi_name_en: string
           rashi_name_te: string
           remedies_te?: string | null
           samvatsaram: string
           sort_order?: number
+          vyayam?: number | null
           year_end: string
           year_start: string
         }
         Update: {
+          aadayam?: number | null
+          avamanam?: number | null
           created_at?: string
           id?: string
           prediction_en?: string | null
           prediction_te?: string
+          rajapujyam?: number | null
           rashi_icon?: string
           rashi_name_en?: string
           rashi_name_te?: string
           remedies_te?: string | null
           samvatsaram?: string
           sort_order?: number
+          vyayam?: number | null
           year_end?: string
           year_start?: string
         }
