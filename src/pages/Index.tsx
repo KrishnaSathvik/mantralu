@@ -33,6 +33,9 @@ const Index = () => {
           {/* Daily Mantra */}
           <DailyMantra />
 
+          {/* Rashi Phalalu - shows for 1 week after Ugadi */}
+          <RashiPhalaluSection />
+
           {/* Categories */}
           <section>
             <div className="flex items-center justify-between mb-3">
