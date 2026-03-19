@@ -26,6 +26,9 @@ const Index = () => {
         </header>
 
         <main className="page-main space-y-8 pb-4">
+          {/* Ugadi Banner */}
+          <UgadiBanner />
+
           {/* Daily Mantra */}
           <DailyMantra />
 
