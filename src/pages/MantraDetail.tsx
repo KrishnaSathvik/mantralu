@@ -2,7 +2,8 @@ import { useParams, Link } from "react-router-dom";
 import { useMantraBySlug } from "@/hooks/use-mantras";
 import { useSettings } from "@/hooks/use-settings";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Heart, Share2, Copy, Check } from "lucide-react";
+import { ArrowLeft, Heart, Share2, Copy, Check, Repeat } from "lucide-react";
+import { JapaCounter } from "@/components/JapaCounter";
 import { DynamicIcon } from "@/components/DynamicIcon";
 import { ShareSheet } from "@/components/ShareSheet";
 import { motion } from "framer-motion";
@@ -42,6 +43,7 @@ const MantraDetail = () => {
   const [copied, setCopied] = useState(false);
   const [viewMode, setViewMode] = useState<"telugu" | "english">("telugu");
   const [shareOpen, setShareOpen] = useState(false);
+  const [japaOpen, setJapaOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -138,6 +140,9 @@ const MantraDetail = () => {
               <h1 className="font-display text-lg sm:text-xl text-foreground truncate">{mantra.title_en}</h1>
             </div>
             <div className="flex items-center gap-0 shrink-0">
+              <motion.button whileTap={{ scale: 0.85 }} onClick={() => setJapaOpen(true)} className="rounded-full p-2.5 hover:bg-secondary active:bg-secondary transition-colors" title="Japa Counter">
+                <Repeat className="h-[18px] w-[18px] text-muted-foreground" />
+              </motion.button>
               <motion.button whileTap={{ scale: 0.85 }} onClick={handleShare} className="rounded-full p-2.5 hover:bg-secondary active:bg-secondary transition-colors">
                 <Share2 className="h-[18px] w-[18px] text-muted-foreground" />
               </motion.button>
@@ -295,6 +300,13 @@ const MantraDetail = () => {
           text={mantra.transliteration}
           url={window.location.href}
           imageUrl={deityImage}
+        />
+
+        <JapaCounter
+          open={japaOpen}
+          onClose={() => setJapaOpen(false)}
+          mantraTitle={mantra.title_en}
+          recommendedCount={mantra.chant_count}
         />
       </div>
     </PageTransition>
