@@ -33,8 +33,14 @@ const Index = () => {
           {/* Rashi Phalalu - shows for 1 week after Ugadi (promoted above daily mantra on Ugadi) */}
           <RashiPhalaluSection />
 
-          {/* Daily Mantra - hidden on Ugadi day itself */}
-          {new Date().toDateString() !== new Date("2026-03-19").toDateString() && <DailyMantra />}
+          {/* Daily Mantra - hidden during Ugadi week when Rashi Phalalu is showing */}
+          {(() => {
+            const now = new Date();
+            const ugadi = new Date("2026-03-19T00:00:00");
+            const ugadiEnd = new Date("2026-03-26T00:00:00");
+            const isUgadiWeek = now >= ugadi && now <= ugadiEnd;
+            return !isUgadiWeek ? <DailyMantra /> : null;
+          })()}
 
           {/* Categories */}
           <section>
