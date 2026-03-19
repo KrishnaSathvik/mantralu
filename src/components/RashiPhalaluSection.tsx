@@ -13,6 +13,10 @@ interface RashiPhalalu {
   prediction_en: string | null;
   remedies_te: string | null;
   sort_order: number;
+  aadayam: number | null;
+  vyayam: number | null;
+  rajapujyam: number | null;
+  avamanam: number | null;
 }
 
 function useRashiPhalalu() {
