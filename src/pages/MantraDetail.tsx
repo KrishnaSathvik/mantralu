@@ -43,6 +43,7 @@ const MantraDetail = () => {
   const [copied, setCopied] = useState(false);
   const [viewMode, setViewMode] = useState<"telugu" | "english">("telugu");
   const [shareOpen, setShareOpen] = useState(false);
+  const [japaOpen, setJapaOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
