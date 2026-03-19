@@ -301,6 +301,13 @@ const MantraDetail = () => {
           url={window.location.href}
           imageUrl={deityImage}
         />
+
+        <JapaCounter
+          open={japaOpen}
+          onClose={() => setJapaOpen(false)}
+          mantraTitle={mantra.title_en}
+          recommendedCount={mantra.chant_count}
+        />
       </div>
     </PageTransition>
   );
