@@ -75,7 +75,7 @@ export function RashiPhalaluSection({ forceShow = false }: { forceShow?: boolean
                     : "bg-card p-3 hover:bg-secondary/50 hover:border-primary/20"
                 }`}
               >
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                   <span className="text-2xl">{r.rashi_icon}</span>
                   <div className="min-w-0 flex-1">
                     <p className="font-display text-sm text-foreground leading-tight truncate">
@@ -89,6 +89,12 @@ export function RashiPhalaluSection({ forceShow = false }: { forceShow?: boolean
                     <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
                   ) : null}
                 </div>
+                {!isExpanded && r.aadayam != null && (
+                  <div className="flex gap-2 mt-1.5 text-[9px] text-muted-foreground">
+                    <span>💰{r.aadayam}</span>
+                    <span>💸{r.vyayam}</span>
+                  </div>
+                )}
               </motion.button>
 
               <AnimatePresence>
