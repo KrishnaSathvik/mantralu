@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { getUserName, setUserName as saveUserName, getDeviceId } from "@/lib/device";
 import { supabase } from "@/integrations/supabase/client";
 import { FeedbackSection, ReviewSection } from "@/components/FeedbackReview";
+import { RashiPhalaluSection } from "@/components/RashiPhalaluSection";
 import {
   loadSessions,
   saveSessions,
