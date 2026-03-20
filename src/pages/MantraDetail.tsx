@@ -225,7 +225,7 @@ const MantraDetail = () => {
             >
               {viewMode === "telugu" ? (
                 <p className="font-telugu leading-[2.2] text-foreground whitespace-pre-line text-center tracking-wide" style={{ fontSize: `${fontSize}px` }}>
-                  {mantra.telugu_text}
+                  {mantra.telugu_text.replace(/ ([।॥])/g, '\u00A0$1')}
                 </p>
               ) : (
                 <p className="leading-[2] text-foreground/80 whitespace-pre-line text-center" style={{ fontSize: `${Math.max(fontSize - 2, 14)}px` }}>
